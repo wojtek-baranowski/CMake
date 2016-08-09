@@ -113,8 +113,8 @@ if(NOT DEFINED CTEST_BUILD_CONFIGURATION)
 endif()
 
 # Choose CTest reporting mode.
-if(NOT "${CTEST_CMAKE_GENERATOR}" MATCHES "Make")
-  # Launchers work only with Makefile generators.
+if(NOT "${CTEST_CMAKE_GENERATOR}" MATCHES "Make|Ninja")
+  # Launchers work only with Makefile and Ninja generators.
   set(CTEST_USE_LAUNCHERS 0)
 elseif(NOT DEFINED CTEST_USE_LAUNCHERS)
   set(CTEST_USE_LAUNCHERS 1)
@@ -304,7 +304,7 @@ set(ENV{LC_ALL} C)
 macro(write_cache)
   set(cache_build_type "")
   set(cache_make_program "")
-  if(CTEST_CMAKE_GENERATOR MATCHES "Make")
+  if(CTEST_CMAKE_GENERATOR MATCHES "Make|Ninja")
     set(cache_build_type CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION})
     if(CMAKE_MAKE_PROGRAM)
       set(cache_make_program CMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM})

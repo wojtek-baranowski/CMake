@@ -70,6 +70,9 @@ public:
   std::string EncodePath(const std::string& path);
   static std::string EncodeDepfileSpace(const std::string& path);
 
+  cmLinkLineComputer* CreateLinkLineComputer(cmState::Directory stateDir) const
+    CM_OVERRIDE;
+
   /**
    * Write the given @a comment to the output stream @a os. It
    * handles new line character properly.
@@ -233,6 +236,9 @@ public:
     return this->RulesFileStream;
   }
 
+  static std::string ConvertToNinjaPath(const std::string& path,
+                                        cmState::Directory stateDir,
+                                        std::string const& prefix);
   std::string ConvertToNinjaPath(const std::string& path);
   std::string ConvertToNinjaFolderRule(const std::string& path);
 
@@ -334,6 +340,7 @@ public:
   bool SupportsImplicitOuts() const;
 
   std::string NinjaOutputPath(std::string const& path);
+  std::string GetOutputPathPrefix() const { return this->OutputPathPrefix; }
   bool HasOutputPathPrefix() const { return !this->OutputPathPrefix.empty(); }
   void StripNinjaOutputPathPrefixAsSuffix(std::string& path);
 

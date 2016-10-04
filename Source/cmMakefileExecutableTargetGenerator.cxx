@@ -5,6 +5,7 @@
 #include "cmGeneratedFileStream.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalUnixMakefileGenerator3.h"
+#include "cmLinkLineComputer.h"
 #include "cmLocalGenerator.h"
 #include "cmLocalUnixMakefileGenerator3.h"
 #include "cmMakefile.h"
@@ -130,16 +131,16 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
     targetFullPathPDB, cmOutputConverter::SHELL);
   // Convert to the output path to use in constructing commands.
   std::string targetOutPath = this->LocalGenerator->ConvertToOutputFormat(
-    this->LocalGenerator->ConvertToRelativePath(
+    this->LocalGenerator->MaybeConvertToRelativePath(
       this->LocalGenerator->GetCurrentBinaryDirectory(), targetFullPath),
     cmOutputConverter::SHELL);
   std::string targetOutPathReal = this->LocalGenerator->ConvertToOutputFormat(
-    this->LocalGenerator->ConvertToRelativePath(
+    this->LocalGenerator->MaybeConvertToRelativePath(
       this->LocalGenerator->GetCurrentBinaryDirectory(), targetFullPathReal),
     cmOutputConverter::SHELL);
   std::string targetOutPathImport =
     this->LocalGenerator->ConvertToOutputFormat(
-      this->LocalGenerator->ConvertToRelativePath(
+      this->LocalGenerator->MaybeConvertToRelativePath(
         this->LocalGenerator->GetCurrentBinaryDirectory(),
         targetFullPathImport),
       cmOutputConverter::SHELL);
@@ -210,32 +211,45 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
   this->LocalGenerator->AppendFlags(
     linkFlags, this->GeneratorTarget->GetProperty(linkFlagsConfig));
 
-  this->AddModuleDefinitionFlag(linkFlags);
+  {
+    CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer;
+
+    if (this->Makefile->IsOn("MSVC60")) {
+      linkLineComputer.reset(
+        this->GlobalGenerator->CreateMSVC60LinkLineComputer(
+          this->LocalGenerator->GetStateSnapshot().GetDirectory()));
+    } else {
+      linkLineComputer.reset(this->GlobalGenerator->CreateLinkLineComputer(
+        this->LocalGenerator->GetStateSnapshot().GetDirectory()));
+    }
+
+    this->AddModuleDefinitionFlag(linkLineComputer.get(), linkFlags);
+  }
 
   // Construct a list of files associated with this executable that
   // may need to be cleaned.
   std::vector<std::string> exeCleanFiles;
-  exeCleanFiles.push_back(this->LocalGenerator->ConvertToRelativePath(
+  exeCleanFiles.push_back(this->LocalGenerator->MaybeConvertToRelativePath(
     this->LocalGenerator->GetCurrentBinaryDirectory(), targetFullPath));
 #ifdef _WIN32
   // There may be a manifest file for this target.  Add it to the
   // clean set just in case.
-  exeCleanFiles.push_back(this->LocalGenerator->ConvertToRelativePath(
+  exeCleanFiles.push_back(this->LocalGenerator->MaybeConvertToRelativePath(
     this->LocalGenerator->GetCurrentBinaryDirectory(),
     (targetFullPath + ".manifest").c_str()));
 #endif
   if (targetNameReal != targetName) {
-    exeCleanFiles.push_back(this->LocalGenerator->ConvertToRelativePath(
+    exeCleanFiles.push_back(this->LocalGenerator->MaybeConvertToRelativePath(
       this->LocalGenerator->GetCurrentBinaryDirectory(), targetFullPathReal));
   }
   if (!targetNameImport.empty()) {
-    exeCleanFiles.push_back(this->LocalGenerator->ConvertToRelativePath(
+    exeCleanFiles.push_back(this->LocalGenerator->MaybeConvertToRelativePath(
       this->LocalGenerator->GetCurrentBinaryDirectory(),
       targetFullPathImport));
     std::string implib;
     if (this->GeneratorTarget->GetImplibGNUtoMS(targetFullPathImport,
                                                 implib)) {
-      exeCleanFiles.push_back(this->LocalGenerator->ConvertToRelativePath(
+      exeCleanFiles.push_back(this->LocalGenerator->MaybeConvertToRelativePath(
         this->LocalGenerator->GetCurrentBinaryDirectory(), implib));
     }
   }
@@ -243,7 +257,7 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
   // List the PDB for cleaning only when the whole target is
   // cleaned.  We do not want to delete the .pdb file just before
   // linking the target.
-  this->CleanFiles.push_back(this->LocalGenerator->ConvertToRelativePath(
+  this->CleanFiles.push_back(this->LocalGenerator->MaybeConvertToRelativePath(
     this->LocalGenerator->GetCurrentBinaryDirectory(), targetFullPathPDB));
 
   // Add the pre-build and pre-link rules building but not when relinking.
@@ -318,7 +332,7 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
     std::string objectDir = this->GeneratorTarget->GetSupportDirectory();
 
     objectDir = this->LocalGenerator->ConvertToOutputFormat(
-      this->LocalGenerator->ConvertToRelativePath(
+      this->LocalGenerator->MaybeConvertToRelativePath(
         this->LocalGenerator->GetCurrentBinaryDirectory(), objectDir),
       cmOutputConverter::SHELL);
     vars.ObjectDir = objectDir.c_str();
@@ -326,7 +340,7 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
       ? cmOutputConverter::WATCOMQUOTE
       : cmOutputConverter::SHELL;
     std::string target = this->LocalGenerator->ConvertToOutputFormat(
-      this->LocalGenerator->ConvertToRelativePath(
+      this->LocalGenerator->MaybeConvertToRelativePath(
         this->LocalGenerator->GetCurrentBinaryDirectory(), targetFullPathReal),
       output);
     vars.Target = target.c_str();

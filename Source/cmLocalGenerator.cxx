@@ -12,6 +12,7 @@
 #include "cmInstallGenerator.h"
 #include "cmInstallScriptGenerator.h"
 #include "cmInstallTargetGenerator.h"
+#include "cmLinkLineComputer.h"
 #include "cmMakefile.h"
 #include "cmSourceFile.h"
 #include "cmSystemTools.h"
@@ -731,7 +732,8 @@ std::string cmLocalGenerator::ExpandRuleVariable(
         std::string replace = this->Makefile->GetSafeDefinition(variable);
         // if the variable is not a FLAG then treat it like a path
         if (variable.find("_FLAG") == variable.npos) {
-          std::string ret = this->ConvertToOutputForExisting(replace);
+          std::string ret =
+            this->ConvertToOutputFormat(replace, cmOutputConverter::SHELL);
           // if there is a required first argument to the compiler add it
           // to the compiler string
           if (compilerArg1) {
@@ -828,7 +830,7 @@ std::string cmLocalGenerator::ConvertToIncludeReference(
   std::string const& path, OutputFormat format, bool forceFullPaths)
 {
   static_cast<void>(forceFullPaths);
-  return this->ConvertToOutputForExisting(path, format);
+  return this->ConvertToOutputFormat(path, format);
 }
 
 std::string cmLocalGenerator::GetIncludeFlags(
@@ -1148,9 +1150,10 @@ void cmLocalGenerator::GetStaticLibraryFlags(std::string& flags,
 }
 
 void cmLocalGenerator::GetTargetFlags(
-  const std::string& config, std::string& linkLibs, std::string& flags,
-  std::string& linkFlags, std::string& frameworkPath, std::string& linkPath,
-  cmGeneratorTarget* target, bool useWatcomQuote)
+  cmLinkLineComputer* linkLineComputer, const std::string& config,
+  std::string& linkLibs, std::string& flags, std::string& linkFlags,
+  std::string& frameworkPath, std::string& linkPath, cmGeneratorTarget* target,
+  bool useWatcomQuote)
 {
   const std::string buildType = cmSystemTools::UpperCase(config);
   const char* libraryLinkVariable =
@@ -1202,8 +1205,9 @@ void cmLocalGenerator::GetTargetFlags(
           linkFlags += " ";
         }
       }
-      this->OutputLinkLibraries(linkLibs, frameworkPath, linkPath, *target,
-                                false, false, useWatcomQuote);
+      this->OutputLinkLibraries(linkLineComputer, linkLibs, frameworkPath,
+                                linkPath, *target, false, false,
+                                useWatcomQuote);
     } break;
     case cmState::EXECUTABLE: {
       linkFlags += this->Makefile->GetSafeDefinition("CMAKE_EXE_LINKER_FLAGS");
@@ -1222,8 +1226,9 @@ void cmLocalGenerator::GetTargetFlags(
         return;
       }
       this->AddLanguageFlags(flags, linkLanguage, buildType);
-      this->OutputLinkLibraries(linkLibs, frameworkPath, linkPath, *target,
-                                false, false, useWatcomQuote);
+      this->OutputLinkLibraries(linkLineComputer, linkLibs, frameworkPath,
+                                linkPath, *target, false, false,
+                                useWatcomQuote);
       if (cmSystemTools::IsOn(
             this->Makefile->GetDefinition("BUILD_SHARED_LIBS"))) {
         std::string sFlagVar = std::string("CMAKE_SHARED_BUILD_") +
@@ -1374,48 +1379,15 @@ std::string cmLocalGenerator::GetTargetFortranFlags(
   return std::string();
 }
 
-std::string cmLocalGenerator::ConvertToLinkReference(std::string const& lib,
-                                                     OutputFormat format)
-{
-#if defined(_WIN32) && !defined(__CYGWIN__)
-  // Work-ardound command line parsing limitations in MSVC 6.0
-  if (this->Makefile->IsOn("MSVC60")) {
-    // Search for the last space.
-    std::string::size_type pos = lib.rfind(' ');
-    if (pos != lib.npos) {
-      // Find the slash after the last space, if any.
-      pos = lib.find('/', pos);
-
-      // Convert the portion of the path with a space to a short path.
-      std::string sp;
-      if (cmSystemTools::GetShortPath(lib.substr(0, pos).c_str(), sp)) {
-        // Append the rest of the path with no space.
-        sp += lib.substr(pos);
-
-        // Convert to an output path.
-        return this->ConvertToOutputFormat(sp.c_str(), format);
-      }
-    }
-  }
-#endif
-
-  // Normal behavior.
-  return this->ConvertToOutputFormat(
-    this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(), lib),
-    format);
-}
-
 /**
  * Output the linking rules on a command line.  For executables,
  * targetLibrary should be a NULL pointer.  For libraries, it should point
  * to the name of the library.  This will not link a library against itself.
  */
-void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
-                                           std::string& frameworkPath,
-                                           std::string& linkPath,
-                                           cmGeneratorTarget& tgt, bool relink,
-                                           bool forResponseFile,
-                                           bool useWatcomQuote)
+void cmLocalGenerator::OutputLinkLibraries(
+  cmLinkLineComputer* linkLineComputer, std::string& linkLibraries,
+  std::string& frameworkPath, std::string& linkPath, cmGeneratorTarget& tgt,
+  bool relink, bool forResponseFile, bool useWatcomQuote)
 {
   OutputFormat shellFormat =
     (forResponseFile) ? RESPONSE : ((useWatcomQuote) ? WATCOMQUOTE : SHELL);
@@ -1500,8 +1472,7 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
   std::vector<std::string> const& libDirs = cli.GetDirectories();
   for (std::vector<std::string>::const_iterator libDir = libDirs.begin();
        libDir != libDirs.end(); ++libDir) {
-    std::string libpath =
-      this->ConvertToOutputForExisting(*libDir, shellFormat);
+    std::string libpath = this->ConvertToOutputFormat(*libDir, shellFormat);
     linkPath += " " + libPathFlag;
     linkPath += libpath;
     linkPath += libPathTerminator;
@@ -1517,7 +1488,8 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
       continue;
     }
     if (li->IsPath) {
-      linkLibs += this->ConvertToLinkReference(li->Value, shellFormat);
+      linkLibs += this->ConvertToOutputFormat(
+        linkLineComputer->ConvertToLinkReference(li->Value), shellFormat);
     } else {
       linkLibs += li->Value;
     }

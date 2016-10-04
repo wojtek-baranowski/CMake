@@ -33,6 +33,7 @@ class cmExportBuildFileGenerator;
 class cmExternalMakefileProjectGenerator;
 class cmGeneratorTarget;
 class cmLocalGenerator;
+class cmLinkLineComputer;
 class cmMakefile;
 class cmake;
 
@@ -97,6 +98,12 @@ public:
    * requests that they Generate.
    */
   virtual void Generate();
+
+  virtual cmLinkLineComputer* CreateLinkLineComputer(
+    cmState::Directory stateDir) const;
+
+  cmLinkLineComputer* CreateMSVC60LinkLineComputer(
+    cmState::Directory stateDir) const;
 
   /**
    * Set/Get and Clear the enabled languages.

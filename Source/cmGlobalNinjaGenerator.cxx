@@ -11,6 +11,7 @@
 #include "cmLocalGenerator.h"
 #include "cmLocalNinjaGenerator.h"
 #include "cmMakefile.h"
+#include "cmNinjaLinkLineComputer.h"
 #include "cmOutputConverter.h"
 #include "cmState.h"
 #include "cmSystemTools.h"
@@ -62,6 +63,12 @@ void cmGlobalNinjaGenerator::WriteComment(std::ostream& os,
     lpos = rpos + 1;
   }
   os << "# " << comment.substr(lpos) << "\n\n";
+}
+
+cmLinkLineComputer* cmGlobalNinjaGenerator::CreateLinkLineComputer(
+  cmState::Directory stateDir) const
+{
+  return new cmNinjaLinkLineComputer(stateDir, this->OutputPathPrefix);
 }
 
 std::string cmGlobalNinjaGenerator::EncodeRuleName(std::string const& name)
@@ -830,17 +837,35 @@ static void EnsureTrailingSlash(std::string& path)
 #endif
 }
 
-std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
+std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(
+  const std::string& path, cmState::Directory stateDir,
+  std::string const& prefix)
 {
-  cmLocalNinjaGenerator* ng =
-    static_cast<cmLocalNinjaGenerator*>(this->LocalGenerators[0]);
-  std::string convPath = ng->ConvertToRelativePath(
-    this->LocalGenerators[0]->GetState()->GetBinaryDirectory(), path);
-  convPath = this->NinjaOutputPath(convPath);
+  std::string convPath = path;
+
+  if (cmOutputConverter::ContainedInDirectory(stateDir.GetCurrentBinary(),
+                                              path, stateDir)) {
+    convPath = cmOutputConverter::ForceToRelativePath(
+      stateDir.GetCurrentBinary(), path);
+  }
+
+  if (!cmSystemTools::FileIsFullPath(convPath)) {
+    convPath = prefix + convPath;
+  }
+
 #ifdef _WIN32
   std::replace(convPath.begin(), convPath.end(), '/', '\\');
 #endif
   return convPath;
+}
+
+std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
+{
+  cmLocalNinjaGenerator* ng =
+    static_cast<cmLocalNinjaGenerator*>(this->LocalGenerators[0]);
+
+  return ConvertToNinjaPath(path, ng->GetStateSnapshot().GetDirectory(),
+                            this->OutputPathPrefix);
 }
 
 std::string cmGlobalNinjaGenerator::ConvertToNinjaFolderRule(
@@ -1423,7 +1448,7 @@ void cmGlobalNinjaGenerator::InitOutputPathPrefix()
 
 std::string cmGlobalNinjaGenerator::NinjaOutputPath(std::string const& path)
 {
-  if (!this->HasOutputPathPrefix() || cmSystemTools::FileIsFullPath(path)) {
+  if (cmSystemTools::FileIsFullPath(path)) {
     return path;
   }
   return this->OutputPathPrefix + path;

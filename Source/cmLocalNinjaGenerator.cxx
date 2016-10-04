@@ -120,13 +120,6 @@ cmGlobalNinjaGenerator* cmLocalNinjaGenerator::GetGlobalNinjaGenerator()
 
 // Virtual protected methods.
 
-std::string cmLocalNinjaGenerator::ConvertToLinkReference(
-  std::string const& lib, cmOutputConverter::OutputFormat format)
-{
-  std::string path = this->GetGlobalNinjaGenerator()->ConvertToNinjaPath(lib);
-  return this->ConvertToOutputFormat(path, format);
-}
-
 std::string cmLocalNinjaGenerator::ConvertToIncludeReference(
   std::string const& path, cmOutputConverter::OutputFormat format,
   bool forceFullPaths)
@@ -489,15 +482,12 @@ std::string cmLocalNinjaGenerator::MakeCustomLauncher(
   std::string output;
   const std::vector<std::string>& outputs = ccg.GetOutputs();
   if (!outputs.empty()) {
+    output = outputs[0];
     if (ccg.GetWorkingDirectory().empty()) {
-      output = this->ConvertToOutputFormat(
-        this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(),
-                                    outputs[0]),
-        cmOutputConverter::SHELL);
-    } else {
       output =
-        this->ConvertToOutputFormat(outputs[0], cmOutputConverter::SHELL);
+        this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(), output);
     }
+    output = this->ConvertToOutputFormat(output, cmOutputConverter::SHELL);
   }
   vars.Output = output.c_str();
 

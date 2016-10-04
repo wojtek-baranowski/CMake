@@ -835,8 +835,14 @@ std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
   cmLocalNinjaGenerator* ng =
     static_cast<cmLocalNinjaGenerator*>(this->LocalGenerators[0]);
 
-  cmState::Directory stateDir = ng->GetStateSnapshot().GetDirectory();
+  return ConvertToNinjaPath(path, ng->GetStateSnapshot().GetDirectory(),
+                            this->OutputPathPrefix);
+}
 
+std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(
+  const std::string& path, cmState::Directory stateDir,
+  std::string const& prefix)
+{
   std::string convPath = path;
 
   if (cmOutputConverter::ContainedInDirectory(stateDir.GetCurrentBinary(),
@@ -846,7 +852,7 @@ std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
   }
 
   if (!cmSystemTools::FileIsFullPath(convPath)) {
-    convPath = this->OutputPathPrefix + convPath;
+    convPath = prefix + convPath;
   }
 
 #ifdef _WIN32

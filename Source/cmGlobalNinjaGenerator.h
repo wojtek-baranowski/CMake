@@ -337,6 +337,7 @@ public:
   bool SupportsImplicitOuts() const;
 
   std::string NinjaOutputPath(std::string const& path);
+  std::string GetOutputPathPrefix() const { return this->OutputPathPrefix; }
   bool HasOutputPathPrefix() const { return !this->OutputPathPrefix.empty(); }
   void StripNinjaOutputPathPrefixAsSuffix(std::string& path);
 

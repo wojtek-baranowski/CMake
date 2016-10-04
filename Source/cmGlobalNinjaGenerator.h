@@ -233,6 +233,9 @@ public:
     return this->RulesFileStream;
   }
 
+  static std::string ConvertToNinjaPath(const std::string& path,
+                                        cmState::Directory stateDir,
+                                        std::string const& prefix);
   std::string ConvertToNinjaPath(const std::string& path);
   std::string ConvertToNinjaFolderRule(const std::string& path);
 

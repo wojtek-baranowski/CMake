@@ -830,13 +830,10 @@ static void EnsureTrailingSlash(std::string& path)
 #endif
 }
 
-std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
+std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(
+  const std::string& path, cmState::Directory stateDir,
+  std::string const& prefix)
 {
-  cmLocalNinjaGenerator* ng =
-    static_cast<cmLocalNinjaGenerator*>(this->LocalGenerators[0]);
-
-  cmState::Directory stateDir = ng->GetStateSnapshot().GetDirectory();
-
   std::string convPath = path;
 
   if (cmOutputConverter::ContainedInDirectory(stateDir.GetCurrentBinary(),
@@ -846,13 +843,22 @@ std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
   }
 
   if (!cmSystemTools::FileIsFullPath(convPath)) {
-    convPath = this->OutputPathPrefix + convPath;
+    convPath = prefix + convPath;
   }
 
 #ifdef _WIN32
   std::replace(convPath.begin(), convPath.end(), '/', '\\');
 #endif
   return convPath;
+}
+
+std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
+{
+  cmLocalNinjaGenerator* ng =
+    static_cast<cmLocalNinjaGenerator*>(this->LocalGenerators[0]);
+
+  return ConvertToNinjaPath(path, ng->GetStateSnapshot().GetDirectory(),
+                            this->OutputPathPrefix);
 }
 
 std::string cmGlobalNinjaGenerator::ConvertToNinjaFolderRule(

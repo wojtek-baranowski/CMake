@@ -11,6 +11,7 @@
 #include "cmLocalGenerator.h"
 #include "cmLocalNinjaGenerator.h"
 #include "cmMakefile.h"
+#include "cmNinjaLinkLineComputer.h"
 #include "cmOutputConverter.h"
 #include "cmState.h"
 #include "cmSystemTools.h"
@@ -62,6 +63,12 @@ void cmGlobalNinjaGenerator::WriteComment(std::ostream& os,
     lpos = rpos + 1;
   }
   os << "# " << comment.substr(lpos) << "\n\n";
+}
+
+cmLinkLineComputer* cmGlobalNinjaGenerator::CreateLinkLineComputer(
+  cmState::Directory stateDir) const
+{
+  return new cmNinjaLinkLineComputer(stateDir, this->OutputPathPrefix);
 }
 
 std::string cmGlobalNinjaGenerator::EncodeRuleName(std::string const& name)

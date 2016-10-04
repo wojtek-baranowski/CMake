@@ -120,17 +120,6 @@ cmGlobalNinjaGenerator* cmLocalNinjaGenerator::GetGlobalNinjaGenerator()
 
 // Virtual protected methods.
 
-std::string cmLocalNinjaGenerator::ConvertToLinkReference(
-  std::string const& lib)
-{
-  cmLocalNinjaGenerator* ng = static_cast<cmLocalNinjaGenerator*>(
-    this->GetGlobalNinjaGenerator()->GetLocalGenerators()[0]);
-
-  return cmGlobalNinjaGenerator::ConvertToNinjaPath(
-    lib, ng->GetStateSnapshot().GetDirectory(),
-    this->GetGlobalNinjaGenerator()->GetOutputPathPrefix());
-}
-
 std::string cmLocalNinjaGenerator::ConvertToIncludeReference(
   std::string const& path, cmOutputConverter::OutputFormat format,
   bool forceFullPaths)

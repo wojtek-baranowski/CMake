@@ -10,6 +10,7 @@
 #include "cmGeneratorExpression.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalUnixMakefileGenerator3.h"
+#include "cmLinkLineComputer.h"
 #include "cmLocalGenerator.h"
 #include "cmLocalUnixMakefileGenerator3.h"
 #include "cmMakefile.h"
@@ -1585,9 +1586,20 @@ void cmMakefileTargetGenerator::CreateLinkLibs(
 {
   std::string frameworkPath;
   std::string linkPath;
-  this->LocalGenerator->OutputLinkLibraries(linkLibs, frameworkPath, linkPath,
-                                            *this->GeneratorTarget, relink,
-                                            useResponseFile, useWatcomQuote);
+
+  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer;
+
+  if (this->Makefile->IsOn("MSVC60")) {
+    linkLineComputer.reset(this->GlobalGenerator->CreateMSVC60LinkLineComputer(
+      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
+  } else {
+    linkLineComputer.reset(this->GlobalGenerator->CreateLinkLineComputer(
+      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
+  }
+
+  this->LocalGenerator->OutputLinkLibraries(
+    linkLineComputer.get(), linkLibs, frameworkPath, linkPath,
+    *this->GeneratorTarget, relink, useResponseFile, useWatcomQuote);
   linkLibs = frameworkPath + linkPath + linkLibs;
 
   if (useResponseFile && linkLibs.find_first_not_of(' ') != linkLibs.npos) {

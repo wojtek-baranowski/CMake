@@ -220,9 +220,11 @@ std::string cmOutputConverter::EscapeForShell(const std::string& str,
   if (this->GetState()->UseNMake()) {
     flags |= Shell_Flag_NMake;
   }
+  if (!this->GetState()->UseWindowsShell()) {
+    flags |= Shell_Flag_IsUnix;
+  }
 
-  return Shell__GetArgument(str.c_str(), !this->GetState()->UseWindowsShell(),
-                           flags);
+  return Shell__GetArgument(str.c_str(), flags);
 }
 
 std::string cmOutputConverter::EscapeForCMake(const std::string& str)
@@ -251,7 +253,7 @@ std::string cmOutputConverter::EscapeForCMake(const std::string& str)
 std::string cmOutputConverter::EscapeWindowsShellArgument(const char* arg,
                                                           int shell_flags)
 {
-  return Shell__GetArgument(arg, 0, shell_flags);
+  return Shell__GetArgument(arg, shell_flags);
 }
 
 cmOutputConverter::FortranFormat cmOutputConverter::GetFortranFormat(
@@ -337,10 +339,10 @@ int cmOutputConverter::Shell__CharNeedsQuotesOnWindows(char c)
           (c == '>') || (c == '|') || (c == '^'));
 }
 
-int cmOutputConverter::Shell__CharNeedsQuotes(char c, int isUnix, int flags)
+int cmOutputConverter::Shell__CharNeedsQuotes(char c, int flags)
 {
   /* On Windows the built-in command shell echo never needs quotes.  */
-  if (!isUnix && (flags & Shell_Flag_EchoWindows)) {
+  if (!(flags & Shell_Flag_IsUnix) && (flags & Shell_Flag_EchoWindows)) {
     return 0;
   }
 
@@ -349,7 +351,7 @@ int cmOutputConverter::Shell__CharNeedsQuotes(char c, int isUnix, int flags)
     return 1;
   }
 
-  if (isUnix) {
+  if (flags & Shell_Flag_IsUnix) {
     /* On UNIX several special characters need quotes to preserve them.  */
     if (Shell__CharNeedsQuotesOnUnix(c)) {
       return 1;
@@ -407,8 +409,7 @@ flag later when we understand applications of this better.
 */
 #define KWSYS_SYSTEM_SHELL_QUOTE_MAKE_VARIABLES 0
 
-int cmOutputConverter::Shell__ArgumentNeedsQuotes(const char* in, int isUnix,
-                                                  int flags)
+int cmOutputConverter::Shell__ArgumentNeedsQuotes(const char* in, int flags)
 {
   /* The empty string needs quotes.  */
   if (!*in) {
@@ -440,14 +441,14 @@ int cmOutputConverter::Shell__ArgumentNeedsQuotes(const char* in, int isUnix,
       }
 
       /* Check whether this character needs quotes.  */
-      if (Shell__CharNeedsQuotes(*c, isUnix, flags)) {
+      if (Shell__CharNeedsQuotes(*c, flags)) {
         return 1;
       }
     }
   }
 
   /* On Windows some single character arguments need quotes.  */
-  if (!isUnix && *in && !*(in + 1)) {
+  if (flags & Shell_Flag_IsUnix && *in && !*(in + 1)) {
     char c = *in;
     if ((c == '?') || (c == '&') || (c == '^') || (c == '|') || (c == '#')) {
       return 1;
@@ -457,8 +458,7 @@ int cmOutputConverter::Shell__ArgumentNeedsQuotes(const char* in, int isUnix,
   return 0;
 }
 
-std::string cmOutputConverter::Shell__GetArgument(const char* in, int isUnix,
-                                                  int flags)
+std::string cmOutputConverter::Shell__GetArgument(const char* in, int flags)
 {
   std::ostringstream out;
 
@@ -469,11 +469,11 @@ std::string cmOutputConverter::Shell__GetArgument(const char* in, int isUnix,
   int windows_backslashes = 0;
 
   /* Whether the argument must be quoted.  */
-  int needQuotes = Shell__ArgumentNeedsQuotes(in, isUnix, flags);
+  int needQuotes = Shell__ArgumentNeedsQuotes(in, flags);
   if (needQuotes) {
     /* Add the opening quote for this argument.  */
     if (flags & Shell_Flag_WatcomQuote) {
-      if (isUnix) {
+      if (flags & Shell_Flag_IsUnix) {
         out << '"';
       }
       out << '\'';
@@ -505,7 +505,7 @@ std::string cmOutputConverter::Shell__GetArgument(const char* in, int isUnix,
     }
 
     /* Check whether this character needs escaping for the shell.  */
-    if (isUnix) {
+    if (flags & Shell_Flag_IsUnix) {
       /* On Unix a few special characters need escaping even inside a
          quoted argument.  */
       if (*c == '\\' || *c == '"' || *c == '`' || *c == '$') {
@@ -602,7 +602,7 @@ std::string cmOutputConverter::Shell__GetArgument(const char* in, int isUnix,
     /* Add the closing quote for this argument.  */
     if (flags & Shell_Flag_WatcomQuote) {
       out << '\'';
-      if (isUnix) {
+      if (flags & Shell_Flag_IsUnix) {
         out << '"';
       }
     } else {

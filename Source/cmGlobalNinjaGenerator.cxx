@@ -1423,7 +1423,7 @@ void cmGlobalNinjaGenerator::InitOutputPathPrefix()
 
 std::string cmGlobalNinjaGenerator::NinjaOutputPath(std::string const& path)
 {
-  if (!this->HasOutputPathPrefix() || cmSystemTools::FileIsFullPath(path)) {
+  if (cmSystemTools::FileIsFullPath(path)) {
     return path;
   }
   return this->OutputPathPrefix + path;

@@ -837,8 +837,13 @@ std::string cmGlobalNinjaGenerator::ConvertToNinjaPath(const std::string& path)
 
   cmState::Directory stateDir = ng->GetStateSnapshot().GetDirectory();
 
-  std::string convPath =
-    ng->ConvertToRelativePath(stateDir.GetCurrentBinary(), path);
+  std::string convPath = path;
+
+  if (cmOutputConverter::ContainedInDirectory(stateDir.GetCurrentBinary(),
+                                              path, stateDir)) {
+    convPath = cmOutputConverter::ForceToRelativePath(
+      stateDir.GetCurrentBinary(), path);
+  }
 
   if (!cmSystemTools::FileIsFullPath(convPath)) {
     convPath = this->OutputPathPrefix + convPath;

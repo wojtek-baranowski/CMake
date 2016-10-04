@@ -1580,6 +1580,15 @@ std::string cmMakefileTargetGenerator::CreateResponseFile(
   return responseFileName;
 }
 
+cmLinkLineComputer* cmMakefileTargetGenerator::CreateLinkLineComputer(
+  cmState::Directory stateDir)
+{
+  if (this->Makefile->IsOn("MSVC60")) {
+    return this->GlobalGenerator->CreateMSVC60LinkLineComputer(stateDir);
+  }
+  return this->GlobalGenerator->CreateLinkLineComputer(stateDir);
+}
+
 void cmMakefileTargetGenerator::CreateLinkLibs(
   std::string& linkLibs, bool relink, bool useResponseFile,
   std::vector<std::string>& makefile_depends, bool useWatcomQuote)
@@ -1587,15 +1596,9 @@ void cmMakefileTargetGenerator::CreateLinkLibs(
   std::string frameworkPath;
   std::string linkPath;
 
-  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer;
-
-  if (this->Makefile->IsOn("MSVC60")) {
-    linkLineComputer.reset(this->GlobalGenerator->CreateMSVC60LinkLineComputer(
+  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
+    this->CreateLinkLineComputer(
       this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-  } else {
-    linkLineComputer.reset(this->GlobalGenerator->CreateLinkLineComputer(
-      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-  }
 
   this->LocalGenerator->OutputLinkLibraries(
     linkLineComputer.get(), linkLibs, frameworkPath, linkPath,

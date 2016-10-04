@@ -3,6 +3,8 @@
 
 #include "cmMSVC60LinkLineComputer.h"
 
+#include "cmSystemTools.h"
+
 cmMSVC60LinkLineComputer::cmMSVC60LinkLineComputer(cmState::Directory stateDir)
   : cmLinkLineComputer(stateDir)
 {

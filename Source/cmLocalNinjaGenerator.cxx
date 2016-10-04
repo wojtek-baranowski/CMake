@@ -123,7 +123,12 @@ cmGlobalNinjaGenerator* cmLocalNinjaGenerator::GetGlobalNinjaGenerator()
 std::string cmLocalNinjaGenerator::ConvertToLinkReference(
   std::string const& lib)
 {
-  return this->GetGlobalNinjaGenerator()->ConvertToNinjaPath(lib);
+  cmLocalNinjaGenerator* ng = static_cast<cmLocalNinjaGenerator*>(
+    this->GetGlobalNinjaGenerator()->GetLocalGenerators()[0]);
+
+  return cmGlobalNinjaGenerator::ConvertToNinjaPath(
+    lib, ng->GetStateSnapshot().GetDirectory(),
+    this->GetGlobalNinjaGenerator()->GetOutputPathPrefix());
 }
 
 std::string cmLocalNinjaGenerator::ConvertToIncludeReference(

@@ -8,7 +8,6 @@
 #include "cmLinkLineComputer.h"
 #include "cmLocalGenerator.h"
 #include "cmLocalUnixMakefileGenerator3.h"
-#include "cmMSVC60LinkLineComputer.h"
 #include "cmMakefile.h"
 #include "cmOSXBundleGenerator.h"
 #include "cmOutputConverter.h"
@@ -162,15 +161,9 @@ void cmMakefileLibraryTargetGenerator::WriteSharedLibraryRules(bool relink)
   this->LocalGenerator->AddConfigVariableFlags(
     extraFlags, "CMAKE_SHARED_LINKER_FLAGS", this->ConfigName);
 
-  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer;
-
-  if (this->Makefile->IsOn("MSVC60")) {
-    linkLineComputer.reset(this->GlobalGenerator->CreateMSVC60LinkLineComputer(
+  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
+    this->CreateLinkLineComputer(
       this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-  } else {
-    linkLineComputer.reset(this->GlobalGenerator->CreateLinkLineComputer(
-      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-  }
 
   this->AddModuleDefinitionFlag(linkLineComputer.get(), extraFlags);
 
@@ -198,15 +191,9 @@ void cmMakefileLibraryTargetGenerator::WriteModuleLibraryRules(bool relink)
   this->LocalGenerator->AddConfigVariableFlags(
     extraFlags, "CMAKE_MODULE_LINKER_FLAGS", this->ConfigName);
 
-  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer;
-
-  if (this->Makefile->IsOn("MSVC60")) {
-    linkLineComputer.reset(this->GlobalGenerator->CreateMSVC60LinkLineComputer(
+  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
+    this->CreateLinkLineComputer(
       this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-  } else {
-    linkLineComputer.reset(this->GlobalGenerator->CreateLinkLineComputer(
-      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-  }
 
   this->AddModuleDefinitionFlag(linkLineComputer.get(), extraFlags);
 

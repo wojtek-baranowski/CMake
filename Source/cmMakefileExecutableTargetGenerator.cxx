@@ -212,16 +212,9 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
     linkFlags, this->GeneratorTarget->GetProperty(linkFlagsConfig));
 
   {
-    CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer;
-
-    if (this->Makefile->IsOn("MSVC60")) {
-      linkLineComputer.reset(
-        this->GlobalGenerator->CreateMSVC60LinkLineComputer(
-          this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-    } else {
-      linkLineComputer.reset(this->GlobalGenerator->CreateLinkLineComputer(
+    CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
+      this->CreateLinkLineComputer(
         this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-    }
 
     this->AddModuleDefinitionFlag(linkLineComputer.get(), linkFlags);
   }

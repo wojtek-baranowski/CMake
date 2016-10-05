@@ -12,7 +12,6 @@
 #include "cmGeneratorTarget.h"
 #include "cmGlobalGenerator.h"
 #include "cmGlobalGeneratorFactory.h"
-#include "cmLinkLineComputer.h"
 #include "cmLocalGenerator.h"
 #include "cmMakefile.h"
 #include "cmMessenger.h"
@@ -583,10 +582,8 @@ bool cmake::FindPackage(const std::vector<std::string>& args)
     gg->CreateGenerationObjects();
     cmGeneratorTarget* gtgt = gg->FindGeneratorTarget(tgt->GetName());
     cmLocalGenerator* lg = gtgt->GetLocalGenerator();
-    CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
-      gg->CreateLinkLineComputer(lg->GetStateSnapshot().GetDirectory()));
-    lg->GetTargetFlags(linkLineComputer.get(), buildType, linkLibs, flags,
-                       linkFlags, frameworkPath, linkPath, gtgt, false);
+    lg->GetTargetFlags(buildType, linkLibs, flags, linkFlags, frameworkPath,
+                       linkPath, gtgt, false);
     linkLibs = frameworkPath + linkPath + linkLibs;
 
     printf("%s\n", linkLibs.c_str());

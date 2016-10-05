@@ -3,7 +3,7 @@
 #ifndef cm_codecvt_hxx
 #define cm_codecvt_hxx
 
-#include <codecvt>
+#include <locale>
 #include <vector>
 
 class codecvt : public std::codecvt<char, char, mbstate_t>

@@ -18,7 +18,7 @@ public:
 
 #ifdef CMAKE_BUILD_WITH_CMAKE
 
-  codecvt(Encoding encoding);
+  codecvt(Encoding e);
 
 protected:
   virtual ~codecvt();

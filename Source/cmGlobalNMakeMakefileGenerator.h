@@ -29,7 +29,7 @@ public:
   /** Get encoding used by generator for makefile files */
   codecvt::Encoding GetMakefileEncoding() const CM_OVERRIDE
   {
-    return codecvt::Encoding::ANSI;
+    return codecvt::ANSI;
   }
 
   /** Get the documentation entry for this generator.  */

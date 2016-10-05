@@ -9,11 +9,11 @@
 #include <cmsys/Encoding.hxx>
 #endif
 
-codecvt::codecvt(Encoding encoding)
+codecvt::codecvt(Encoding e)
   : m_codepage(0)
   , m_lastState(0)
 {
-  switch (encoding) {
+  switch (e) {
     case codecvt::ANSI:
 #if defined(_WIN32)
       m_noconv = false;

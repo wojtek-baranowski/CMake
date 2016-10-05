@@ -64,7 +64,7 @@ public:
   /** Get encoding used by generator for makefile files */
   virtual codecvt::Encoding GetMakefileEncoding() const
   {
-    return codecvt::Encoding::None;
+    return codecvt::None;
   }
 
   /** Tell the generator about the target system.  */

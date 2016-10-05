@@ -300,8 +300,6 @@ set(SRCS
   cmInstallDirectoryGenerator.cxx
   cmLinkedTree.h
   cmLinkItem.h
-  cmLinkLineComputer.cxx
-  cmLinkLineComputer.h
   cmListFileCache.cxx
   cmListFileCache.h
   cmListFileLexer.c
@@ -320,8 +318,6 @@ set(SRCS
   cmMakefileUtilityTargetGenerator.cxx
   cmMessenger.cxx
   cmMessenger.h
-  cmMSVC60LinkLineComputer.cxx
-  cmMSVC60LinkLineComputer.h
   cmOSXBundleGenerator.cxx
   cmOSXBundleGenerator.h
   cmOutputConverter.cxx
@@ -547,8 +543,6 @@ set(SRCS ${SRCS}
   cmNinjaNormalTargetGenerator.h
   cmNinjaUtilityTargetGenerator.cxx
   cmNinjaUtilityTargetGenerator.h
-  cmNinjaLinkLineComputer.cxx
-  cmNinjaLinkLineComputer.h
   )
 
 # Temporary variable for tools targets

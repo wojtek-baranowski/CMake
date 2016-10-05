@@ -15,7 +15,7 @@ cmGeneratedFileStream::cmGeneratedFileStream(Encoding encoding)
   , Stream()
 {
 #ifdef CMAKE_BUILD_WITH_CMAKE
-  if (encoding != Encoding::None) {
+  if (encoding != codecvt::None) {
     imbue(std::locale(getloc(), new codecvt(encoding)));
   }
 #else
@@ -35,7 +35,7 @@ cmGeneratedFileStream::cmGeneratedFileStream(const char* name, bool quiet,
     cmSystemTools::ReportLastSystemError("");
   }
 #ifdef CMAKE_BUILD_WITH_CMAKE
-  if (encoding != Encoding::None) {
+  if (encoding != codecvt::None) {
     imbue(std::locale(getloc(), new codecvt(encoding)));
   }
 #else

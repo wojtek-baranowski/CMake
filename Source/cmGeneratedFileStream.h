@@ -78,7 +78,7 @@ public:
    * This constructor prepares a default stream.  The open method must
    * be used before writing to the stream.
    */
-  cmGeneratedFileStream(Encoding encoding = Encoding::None);
+  cmGeneratedFileStream(Encoding encoding = codecvt::None);
 
   /**
    * This constructor takes the name of the file to be generated.  It
@@ -87,7 +87,7 @@ public:
    * second argument is set to true.
    */
   cmGeneratedFileStream(const char* name, bool quiet = false,
-                        Encoding encoding = Encoding::None);
+                        Encoding encoding = codecvt::None);
 
   /**
    * The destructor checks the stream status to be sure the temporary

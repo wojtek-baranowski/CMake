@@ -731,7 +731,8 @@ std::string cmLocalGenerator::ExpandRuleVariable(
         std::string replace = this->Makefile->GetSafeDefinition(variable);
         // if the variable is not a FLAG then treat it like a path
         if (variable.find("_FLAG") == variable.npos) {
-          std::string ret = this->ConvertToOutputForExisting(replace);
+          std::string ret =
+            this->ConvertToOutputFormat(replace, cmOutputConverter::SHELL);
           // if there is a required first argument to the compiler add it
           // to the compiler string
           if (compilerArg1) {
@@ -828,7 +829,7 @@ std::string cmLocalGenerator::ConvertToIncludeReference(
   std::string const& path, OutputFormat format, bool forceFullPaths)
 {
   static_cast<void>(forceFullPaths);
-  return this->ConvertToOutputForExisting(path, format);
+  return this->ConvertToOutputFormat(path, format);
 }
 
 std::string cmLocalGenerator::GetIncludeFlags(
@@ -1374,8 +1375,7 @@ std::string cmLocalGenerator::GetTargetFortranFlags(
   return std::string();
 }
 
-std::string cmLocalGenerator::ConvertToLinkReference(std::string const& lib,
-                                                     OutputFormat format)
+std::string cmLocalGenerator::ConvertToLinkReference(std::string const& lib)
 {
 #if defined(_WIN32) && !defined(__CYGWIN__)
   // Work-ardound command line parsing limitations in MSVC 6.0
@@ -1392,17 +1392,14 @@ std::string cmLocalGenerator::ConvertToLinkReference(std::string const& lib,
         // Append the rest of the path with no space.
         sp += lib.substr(pos);
 
-        // Convert to an output path.
-        return this->ConvertToOutputFormat(sp.c_str(), format);
+        return sp;
       }
     }
   }
 #endif
 
   // Normal behavior.
-  return this->ConvertToOutputFormat(
-    this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(), lib),
-    format);
+  return this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(), lib);
 }
 
 /**
@@ -1500,8 +1497,7 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
   std::vector<std::string> const& libDirs = cli.GetDirectories();
   for (std::vector<std::string>::const_iterator libDir = libDirs.begin();
        libDir != libDirs.end(); ++libDir) {
-    std::string libpath =
-      this->ConvertToOutputForExisting(*libDir, shellFormat);
+    std::string libpath = this->ConvertToOutputFormat(*libDir, shellFormat);
     linkPath += " " + libPathFlag;
     linkPath += libpath;
     linkPath += libPathTerminator;
@@ -1517,7 +1513,8 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
       continue;
     }
     if (li->IsPath) {
-      linkLibs += this->ConvertToLinkReference(li->Value, shellFormat);
+      linkLibs += this->ConvertToOutputFormat(
+        this->ConvertToLinkReference(li->Value), shellFormat);
     } else {
       linkLibs += li->Value;
     }

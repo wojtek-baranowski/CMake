@@ -1434,6 +1434,8 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
 
   std::string linkLanguage = cli.GetLinkLanguage();
 
+  std::string linkLibs;
+
   std::string libPathFlag =
     this->Makefile->GetRequiredDefinition("CMAKE_LIBRARY_PATH_FLAG");
   std::string libPathTerminator =

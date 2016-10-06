@@ -1248,6 +1248,14 @@ void cmLocalGenerator::GetTargetFlags(
         linkFlags += this->Makefile->GetSafeDefinition(exportFlagVar);
         linkFlags += " ";
       }
+
+      std::string cmp0065Flags =
+        this->GetLinkLibsCMP0065(linkLanguage, *target);
+      if (!cmp0065Flags.empty()) {
+        linkFlags += cmp0065Flags;
+        linkFlags += " ";
+      }
+
       const char* targetLinkFlags = target->GetProperty("LINK_FLAGS");
       if (targetLinkFlags) {
         linkFlags += targetLinkFlags;
@@ -1429,8 +1437,6 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
   cmComputeLinkInformation& cli = *pcli;
 
   std::string linkLanguage = cli.GetLinkLanguage();
-
-  std::string linkLibs = this->GetLinkLibsCMP0065(linkLanguage, tgt);
 
   std::string libPathFlag =
     this->Makefile->GetRequiredDefinition("CMAKE_LIBRARY_PATH_FLAG");

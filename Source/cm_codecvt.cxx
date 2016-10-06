@@ -10,8 +10,10 @@
 #endif
 
 codecvt::codecvt(Encoding e)
-  : m_codepage(0)
-  , m_lastState(0)
+  : m_lastState(0)
+#if defined(_WIN32)
+  , m_codepage(0)
+#endif
 {
   switch (e) {
     case codecvt::ANSI:
@@ -21,8 +23,7 @@ codecvt::codecvt(Encoding e)
       break;
 #endif
     // We don't know which ANSI encoding to use for other platforms than
-    // Windows
-    // so we don't do any conversion there
+    // Windows so we don't do any conversion there
     case codecvt::UTF8:
     // Assume internal encoding is UTF-8
     case codecvt::None:
@@ -47,7 +48,7 @@ std::codecvt_base::result codecvt::do_out(mbstate_t& state, const char* from,
   if (m_noconv) {
     return noconv;
   }
-  std::codecvt_base::result result = error;
+  std::codecvt_base::result res = error;
 #if defined(_WIN32)
   from_next = from;
   to_next = to;
@@ -106,10 +107,10 @@ std::codecvt_base::result codecvt::do_out(mbstate_t& state, const char* from,
       if (r > 0) {
         from_next = from_end;
         to_next = to + r;
-        result = ok;
+        res = ok;
       }
     } else {
-      result = partial;
+      res = partial;
       from_next = from_end;
       to_next = to;
     }
@@ -122,16 +123,16 @@ std::codecvt_base::result codecvt::do_out(mbstate_t& state, const char* from,
   static_cast<void>(to);
   static_cast<void>(to_end);
   static_cast<void>(to_next);
-  result = codecvt::noconv;
+  res = codecvt::noconv;
 #endif
-  return result;
+  return res;
 };
 
 std::codecvt_base::result codecvt::do_unshift(mbstate_t& state, char* to,
                                               char* to_end,
                                               char*& to_next) const
 {
-  std::codecvt_base::result result = error;
+  std::codecvt_base::result res = error;
   to_next = to;
 #if defined(_WIN32)
   unsigned int& stateId = reinterpret_cast<unsigned int&>(state);
@@ -149,17 +150,17 @@ std::codecvt_base::result codecvt::do_unshift(mbstate_t& state, char* to,
                                 NULL, NULL);
     if (r > 0) {
       to_next = to + r;
-      result = ok;
+      res = ok;
     }
   } else {
-    result = ok;
+    res = ok;
   }
 #else
   static_cast<void>(state);
   static_cast<void>(to_end);
-  result = ok;
+  res = ok;
 #endif
-  return result;
+  return res;
 };
 
 int codecvt::do_max_length() const throw()
@@ -174,7 +175,7 @@ int codecvt::do_encoding() const throw()
 
 unsigned int codecvt::findStateId() const
 {
-  unsigned int id = 0;
+  unsigned int stateId = 0;
   bool add = false;
   const unsigned int maxSize = std::numeric_limits<unsigned int>::max();
   if (m_lastState >= maxSize) {
@@ -189,7 +190,7 @@ unsigned int codecvt::findStateId() const
       i++;
       if (!s.used) {
         m_lastState = i;
-        id = m_lastState;
+        stateId = m_lastState;
         s.used = true;
         s.totalBytes = 0;
         s.bytesLeft = 0;
@@ -205,10 +206,10 @@ unsigned int codecvt::findStateId() const
     }
   };
   if (add) {
-    codecvt::State s = { true, 0, 0, 0, 0, 0, 0 };
+    codecvt::State s = { true, 0, 0, { 0, 0, 0, 0 } };
     m_states.push_back(s);
     m_lastState = (unsigned int)m_states.size();
-    id = m_lastState;
+    stateId = m_lastState;
   }
-  return id;
+  return stateId;
 };

@@ -3,6 +3,8 @@
 #ifndef cm_codecvt_hxx
 #define cm_codecvt_hxx
 
+#include <cmConfigure.h> // IWYU pragma: keep
+
 #include <locale>
 #include <vector>
 
@@ -21,15 +23,15 @@ public:
   codecvt(Encoding e);
 
 protected:
-  virtual ~codecvt();
-  virtual bool do_always_noconv() const throw();
-  virtual result do_out(mbstate_t& state, const char* from,
-                        const char* from_end, const char*& from_next, char* to,
-                        char* to_end, char*& to_next) const;
-  virtual result do_unshift(mbstate_t& state, char* to, char*,
-                            char*& to_next) const;
-  virtual int do_max_length() const throw();
-  virtual int do_encoding() const throw();
+  ~codecvt() CM_OVERRIDE;
+  bool do_always_noconv() const throw() CM_OVERRIDE;
+  result do_out(mbstate_t& state, const char* from, const char* from_end,
+                const char*& from_next, char* to, char* to_end,
+                char*& to_next) const CM_OVERRIDE;
+  result do_unshift(mbstate_t& state, char* to, char*,
+                    char*& to_next) const CM_OVERRIDE;
+  int do_max_length() const throw() CM_OVERRIDE;
+  int do_encoding() const throw() CM_OVERRIDE;
 
 private:
   typedef struct
@@ -43,9 +45,11 @@ private:
   unsigned int findStateId() const;
 
   bool m_noconv;
-  unsigned int m_codepage;
   mutable std::vector<State> m_states;
   mutable unsigned int m_lastState;
+#if defined(_WIN32)
+  unsigned int m_codepage;
+#endif
 
 #endif
 };

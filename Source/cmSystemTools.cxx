@@ -2537,11 +2537,11 @@ bool cmSystemTools::RemoveRPath(std::string const& file, std::string* emsg,
     }
 
     // Get size of one DYNAMIC entry
-    int sizeof_dentry =
+    unsigned long const sizeof_dentry =
       elf.GetDynamicEntryPosition(1) - elf.GetDynamicEntryPosition(0);
 
     // Adjust the entry list as necessary to remove the run path
-    int entriesErased = 0;
+    unsigned long entriesErased = 0;
     for (cmELF::DynamicEntryList::iterator it = dentries.begin();
          it != dentries.end();) {
       if (it->first == cmELF::TagRPath || it->first == cmELF::TagRunPath) {

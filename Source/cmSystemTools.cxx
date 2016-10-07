@@ -2537,7 +2537,7 @@ bool cmSystemTools::RemoveRPath(std::string const& file, std::string* emsg,
     }
 
     // Get size of one DYNAMIC entry
-    int sizeof_dentry =
+    unsigned long const sizeof_dentry =
       elf.GetDynamicEntryPosition(1) - elf.GetDynamicEntryPosition(0);
 
     // Adjust the entry list as necessary to remove the run path

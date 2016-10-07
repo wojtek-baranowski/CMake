@@ -338,25 +338,22 @@ void CCONV cmAddCustomCommandToTarget(void* arg, const char* target,
 }
 
 static void addLinkLibrary(cmMakefile* mf, std::string const& target,
-         std::string const& lib, cmTargetLinkLibraryType llt)
+                           std::string const& lib, cmTargetLinkLibraryType llt)
 {
   cmTarget* t = mf->FindLocalNonAliasTarget(target);
-  if (!t)
-    {
+  if (!t) {
     std::ostringstream e;
-    e << "Attempt to add link library \""
-      << lib << "\" to target \""
-      << target << "\" which is not built in this directory.";
+    e << "Attempt to add link library \"" << lib << "\" to target \"" << target
+      << "\" which is not built in this directory.";
     mf->IssueMessage(cmake::FATAL_ERROR, e.str());
     return;
-    }
+  }
 
   cmTarget* tgt = mf->GetGlobalGenerator()->FindTarget(lib);
-  if(tgt && (tgt->GetType() != cmState::STATIC_LIBRARY) &&
-         (tgt->GetType() != cmState::SHARED_LIBRARY) &&
-         (tgt->GetType() != cmState::INTERFACE_LIBRARY) &&
-         !tgt->IsExecutableWithExports())
-    {
+  if (tgt && (tgt->GetType() != cmState::STATIC_LIBRARY) &&
+      (tgt->GetType() != cmState::SHARED_LIBRARY) &&
+      (tgt->GetType() != cmState::INTERFACE_LIBRARY) &&
+      !tgt->IsExecutableWithExports()) {
     std::ostringstream e;
     e << "Target \"" << lib << "\" of type "
       << cmState::GetTargetTypeName(tgt->GetType())
@@ -364,9 +361,9 @@ static void addLinkLibrary(cmMakefile* mf, std::string const& target,
       << "One may link only to STATIC or SHARED libraries, or "
       << "to executables with the ENABLE_EXPORTS property set.";
     mf->IssueMessage(cmake::FATAL_ERROR, e.str());
-    }
+  }
 
-  t->AddLinkLibrary( *mf, lib, llt );
+  t->AddLinkLibrary(*mf, lib, llt);
 }
 
 void CCONV cmAddLinkLibraryForTarget(void* arg, const char* tgt,
@@ -376,13 +373,13 @@ void CCONV cmAddLinkLibraryForTarget(void* arg, const char* tgt,
 
   switch (libtype) {
     case CM_LIBRARY_GENERAL:
-      addLinkLibrary(mf, tgt,value, GENERAL_LibraryType);
+      addLinkLibrary(mf, tgt, value, GENERAL_LibraryType);
       break;
     case CM_LIBRARY_DEBUG:
-      addLinkLibrary(mf, tgt,value, DEBUG_LibraryType);
+      addLinkLibrary(mf, tgt, value, DEBUG_LibraryType);
       break;
     case CM_LIBRARY_OPTIMIZED:
-      addLinkLibrary(mf, tgt,value, OPTIMIZED_LibraryType);
+      addLinkLibrary(mf, tgt, value, OPTIMIZED_LibraryType);
       break;
   }
 }

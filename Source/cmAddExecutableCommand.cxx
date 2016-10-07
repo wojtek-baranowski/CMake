@@ -2,6 +2,8 @@
    file Copyright.txt or https://cmake.org/licensing for details.  */
 #include "cmAddExecutableCommand.h"
 
+#include "cmLinkLibrariesCommand.h"
+
 // cmExecutableCommand
 bool cmAddExecutableCommand::InitialPass(std::vector<std::string> const& args,
                                          cmExecutionStatus&)
@@ -188,6 +190,9 @@ bool cmAddExecutableCommand::InitialPass(std::vector<std::string> const& args,
   std::vector<std::string> srclists(s, args.end());
   cmTarget* tgt =
     this->Makefile->AddExecutable(exename.c_str(), srclists, excludeFromAll);
+
+  cmLinkLibrariesCommand::PopulateTarget(*tgt, this->Makefile);
+
   if (use_win32) {
     tgt->SetProperty("WIN32_EXECUTABLE", "ON");
   }

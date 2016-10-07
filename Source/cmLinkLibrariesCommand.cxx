@@ -35,3 +35,57 @@ bool cmLinkLibrariesCommand::InitialPass(std::vector<std::string> const& args,
 
   return true;
 }
+
+void cmLinkLibrariesCommand::PopulateTarget(cmTarget& target, cmMakefile* mf)
+{
+  // for these targets do not add anything
+  switch (target.GetType()) {
+    case cmState::UTILITY:
+    case cmState::GLOBAL_TARGET:
+    case cmState::INTERFACE_LIBRARY:
+      return;
+    default:;
+  }
+  if (const char* linkDirsProp = mf->GetProperty("LINK_DIRECTORIES")) {
+    std::vector<std::string> linkDirs;
+    cmSystemTools::ExpandListArgument(linkDirsProp, linkDirs);
+
+    for (std::vector<std::string>::iterator j = linkDirs.begin();
+         j != linkDirs.end(); ++j) {
+      std::string newdir = *j;
+      // remove trailing slashes
+      if (*j->rbegin() == '/') {
+        newdir = j->substr(0, j->size() - 1);
+      }
+      target.AddLinkDirectory(*j);
+    }
+  }
+
+  if (const char* linkLibsProp = mf->GetProperty("LINK_LIBRARIES")) {
+    std::vector<std::string> linkLibs;
+    cmSystemTools::ExpandListArgument(linkLibsProp, linkLibs);
+
+    for (std::vector<std::string>::iterator j = linkLibs.begin();
+         j != linkLibs.end(); ++j) {
+      std::string libraryName = *j;
+      cmTargetLinkLibraryType libType = GENERAL_LibraryType;
+      if (libraryName == "optimized")
+      {
+        libType = OPTIMIZED_LibraryType;
+        ++j;
+        libraryName = *j;
+      } else
+      if (libraryName == "debug")
+      {
+        libType = DEBUG_LibraryType;
+        ++j;
+        libraryName = *j;
+      }
+      // This is equivalent to the target_link_libraries plain signature.
+      target.AddLinkLibrary(*mf, libraryName, libType);
+      target.AppendProperty(
+        "INTERFACE_LINK_LIBRARIES",
+        target.GetDebugGeneratorExpressions(libraryName, libType).c_str());
+    }
+  }
+}

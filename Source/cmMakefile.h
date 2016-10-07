@@ -771,6 +771,9 @@ public:
   void AddExportBuildFileGenerator(cmExportBuildFileGenerator* gen);
 
 protected:
+  // add link libraries and directories to the target
+  void AddGlobalLinkInformation(cmTarget& target);
+
   // Check for a an unused variable
   void LogUnused(const char* reason, const std::string& name) const;
 

@@ -4,7 +4,6 @@
 
 #include "cmState.h"
 #include "cmake.h"
-#include "cmLinkLibrariesCommand.h"
 
 // cmLibraryCommand
 bool cmAddLibraryCommand::InitialPass(std::vector<std::string> const& args,
@@ -356,9 +355,7 @@ bool cmAddLibraryCommand::InitialPass(std::vector<std::string> const& args,
 
   srclists.insert(srclists.end(), s, args.end());
 
-  cmTarget* tgt = this->Makefile->AddLibrary(libName, type, srclists, excludeFromAll);
-
-  cmLinkLibrariesCommand::PopulateTarget(*tgt, this->Makefile);
+  this->Makefile->AddLibrary(libName, type, srclists, excludeFromAll);
 
   return true;
 }

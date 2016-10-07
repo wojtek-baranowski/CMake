@@ -1238,8 +1238,7 @@ void cmMakefile::InitializeFromParent(cmMakefile* parent)
   }
 
   // link libraries
-  this->SetProperty("LINK_LIBRARIES",
-                    parent->GetProperty("LINK_LIBRARIES"));
+  this->SetProperty("LINK_LIBRARIES", parent->GetProperty("LINK_LIBRARIES"));
 
   // link directories
   this->SetProperty("LINK_DIRECTORIES",
@@ -1804,14 +1803,11 @@ void cmMakefile::AddGlobalLinkInformation(cmTarget& target)
          j != linkLibs.end(); ++j) {
       std::string libraryName = *j;
       cmTargetLinkLibraryType libType = GENERAL_LibraryType;
-      if (libraryName == "optimized")
-      {
+      if (libraryName == "optimized") {
         libType = OPTIMIZED_LibraryType;
         ++j;
         libraryName = *j;
-      } else
-      if (libraryName == "debug")
-      {
+      } else if (libraryName == "debug") {
         libType = DEBUG_LibraryType;
         ++j;
         libraryName = *j;
@@ -1837,8 +1833,8 @@ cmTarget* cmMakefile::AddLibrary(const std::string& lname,
                                  bool excludeFromAll)
 {
   assert(type == cmState::STATIC_LIBRARY || type == cmState::SHARED_LIBRARY ||
-      type == cmState::MODULE_LIBRARY || type == cmState::OBJECT_LIBRARY ||
-      type == cmState::INTERFACE_LIBRARY);
+         type == cmState::MODULE_LIBRARY || type == cmState::OBJECT_LIBRARY ||
+         type == cmState::INTERFACE_LIBRARY);
 
   cmTarget* target = this->AddNewTarget(type, lname);
   // Clear its dependencies. Otherwise, dependencies might persist
@@ -2087,28 +2083,25 @@ void cmMakefile::ExpandVariablesCMP0019()
     for (std::vector<std::string>::iterator l = linkLibs.begin();
          l != linkLibs.end(); ++l) {
       std::string libName = *l;
-      if (libName == "optimized")
-      {
+      if (libName == "optimized") {
         ++l;
         libName = *l;
-      } else
-      if (libName == "debug")
-      {
+      } else if (libName == "debug") {
         ++l;
         libName = *l;
       }
-    if (mightExpandVariablesCMP0019(libName.c_str())) {
-      std::string orig = libName;
-      this->ExpandVariablesInString(libName, true, true);
-      if (pol == cmPolicies::WARN && libName != orig) {
-        /* clang-format off */
+      if (mightExpandVariablesCMP0019(libName.c_str())) {
+        std::string orig = libName;
+        this->ExpandVariablesInString(libName, true, true);
+        if (pol == cmPolicies::WARN && libName != orig) {
+          /* clang-format off */
         w << "Evaluated link library\n"
           << "  " << orig << "\n"
           << "as\n"
           << "  " << libName << "\n";
-        /* clang-format on */
+          /* clang-format on */
+        }
       }
-    }
     }
   }
 

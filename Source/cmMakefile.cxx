@@ -1207,71 +1207,6 @@ bool cmMakefile::ParseDefineFlag(std::string const& def, bool remove)
   return true;
 }
 
-void cmMakefile::AddLinkLibrary(const std::string& lib,
-                                cmTargetLinkLibraryType llt)
-{
-  cmTarget::LibraryID tmp;
-  tmp.first = lib;
-  tmp.second = llt;
-  this->LinkLibraries.push_back(tmp);
-}
-
-void cmMakefile::AddLinkLibraryForTarget(const std::string& target,
-                                         const std::string& lib,
-                                         cmTargetLinkLibraryType llt)
-{
-  cmTargets::iterator i = this->Targets.find(target);
-  if (i != this->Targets.end()) {
-    cmTarget* tgt = this->GetGlobalGenerator()->FindTarget(lib);
-    if (tgt) {
-      // if it is not a static or shared library then you can not link to it
-      if (!((tgt->GetType() == cmState::STATIC_LIBRARY) ||
-            (tgt->GetType() == cmState::SHARED_LIBRARY) ||
-            (tgt->GetType() == cmState::INTERFACE_LIBRARY) ||
-            tgt->IsExecutableWithExports())) {
-        std::ostringstream e;
-        e << "Target \"" << lib << "\" of type "
-          << cmState::GetTargetTypeName(tgt->GetType())
-          << " may not be linked into another target.  "
-          << "One may link only to STATIC or SHARED libraries, or "
-          << "to executables with the ENABLE_EXPORTS property set.";
-        this->IssueMessage(cmake::FATAL_ERROR, e.str());
-      }
-    }
-    i->second.AddLinkLibrary(*this, target, lib, llt);
-  } else {
-    std::ostringstream e;
-    e << "Attempt to add link library \"" << lib << "\" to target \"" << target
-      << "\" which is not built in this directory.";
-    this->IssueMessage(cmake::FATAL_ERROR, e.str());
-  }
-}
-
-void cmMakefile::AddLinkDirectoryForTarget(const std::string& target,
-                                           const std::string& d)
-{
-  cmTargets::iterator i = this->Targets.find(target);
-  if (i != this->Targets.end()) {
-    if (this->IsAlias(target)) {
-      std::ostringstream e;
-      e << "ALIAS target \"" << target << "\" "
-        << "may not be linked into another target.";
-      this->IssueMessage(cmake::FATAL_ERROR, e.str());
-      return;
-    }
-    i->second.AddLinkDirectory(d);
-  } else {
-    cmSystemTools::Error(
-      "Attempt to add link directories to non-existent target: ",
-      target.c_str(), " for directory ", d.c_str());
-  }
-}
-
-void cmMakefile::AddLinkLibrary(const std::string& lib)
-{
-  this->AddLinkLibrary(lib, GENERAL_LibraryType);
-}
-
 void cmMakefile::InitializeFromParent(cmMakefile* parent)
 {
   this->SystemIncludeDirectories = parent->SystemIncludeDirectories;
@@ -1303,7 +1238,8 @@ void cmMakefile::InitializeFromParent(cmMakefile* parent)
   }
 
   // link libraries
-  this->LinkLibraries = parent->LinkLibraries;
+  this->SetProperty("LINK_LIBRARIES",
+                    parent->GetProperty("LINK_LIBRARIES"));
 
   // link directories
   this->SetProperty("LINK_DIRECTORIES",
@@ -1835,37 +1771,6 @@ void cmMakefile::SetProjectName(std::string const& p)
   this->StateSnapshot.SetProjectName(p);
 }
 
-void cmMakefile::AddGlobalLinkInformation(const std::string& name,
-                                          cmTarget& target)
-{
-  // for these targets do not add anything
-  switch (target.GetType()) {
-    case cmState::UTILITY:
-    case cmState::GLOBAL_TARGET:
-    case cmState::INTERFACE_LIBRARY:
-      return;
-    default:;
-  }
-  if (const char* linkDirsProp = this->GetProperty("LINK_DIRECTORIES")) {
-    std::vector<std::string> linkDirs;
-    cmSystemTools::ExpandListArgument(linkDirsProp, linkDirs);
-
-    for (std::vector<std::string>::iterator j = linkDirs.begin();
-         j != linkDirs.end(); ++j) {
-      std::string newdir = *j;
-      // remove trailing slashes
-      if (*j->rbegin() == '/') {
-        newdir = j->substr(0, j->size() - 1);
-      }
-      if (std::find(this->LinkDirectories.begin(), this->LinkDirectories.end(),
-                    newdir) == this->LinkDirectories.end()) {
-        target.AddLinkDirectory(*j);
-      }
-    }
-  }
-  target.MergeLinkLibraries(*this, name, this->LinkLibraries);
-}
-
 void cmMakefile::AddAlias(const std::string& lname, std::string const& tgtName)
 {
   this->AliasTargets[lname] = tgtName;
@@ -1877,14 +1782,9 @@ cmTarget* cmMakefile::AddLibrary(const std::string& lname,
                                  const std::vector<std::string>& srcs,
                                  bool excludeFromAll)
 {
-  // wrong type ? default to STATIC
-  if ((type != cmState::STATIC_LIBRARY) && (type != cmState::SHARED_LIBRARY) &&
-      (type != cmState::MODULE_LIBRARY) && (type != cmState::OBJECT_LIBRARY) &&
-      (type != cmState::INTERFACE_LIBRARY)) {
-    this->IssueMessage(cmake::INTERNAL_ERROR,
-                       "cmMakefile::AddLibrary given invalid target type.");
-    type = cmState::STATIC_LIBRARY;
-  }
+  assert(type == cmState::STATIC_LIBRARY || type == cmState::SHARED_LIBRARY ||
+      type == cmState::MODULE_LIBRARY || type == cmState::OBJECT_LIBRARY ||
+      type == cmState::INTERFACE_LIBRARY);
 
   cmTarget* target = this->AddNewTarget(type, lname);
   // Clear its dependencies. Otherwise, dependencies might persist
@@ -1895,7 +1795,6 @@ cmTarget* cmMakefile::AddLibrary(const std::string& lname,
     target->SetProperty("EXCLUDE_FROM_ALL", "TRUE");
   }
   target->AddSources(srcs);
-  this->AddGlobalLinkInformation(lname, *target);
   return target;
 }
 
@@ -1908,7 +1807,6 @@ cmTarget* cmMakefile::AddExecutable(const char* exeName,
     target->SetProperty("EXCLUDE_FROM_ALL", "TRUE");
   }
   target->AddSources(srcs);
-  this->AddGlobalLinkInformation(exeName, *target);
   return target;
 }
 
@@ -2125,20 +2023,36 @@ void cmMakefile::ExpandVariablesCMP0019()
       }
     }
   }
-  for (cmTarget::LinkLibraryVectorType::iterator l =
-         this->LinkLibraries.begin();
-       l != this->LinkLibraries.end(); ++l) {
-    if (mightExpandVariablesCMP0019(l->first.c_str())) {
-      std::string orig = l->first;
-      this->ExpandVariablesInString(l->first, true, true);
-      if (pol == cmPolicies::WARN && l->first != orig) {
+
+  if (const char* linkLibsProp = this->GetProperty("LINK_LIBRARIES")) {
+    std::vector<std::string> linkLibs;
+    cmSystemTools::ExpandListArgument(linkLibsProp, linkLibs);
+
+    for (std::vector<std::string>::iterator l = linkLibs.begin();
+         l != linkLibs.end(); ++l) {
+      std::string libName = *l;
+      if (libName == "optimized")
+      {
+        ++l;
+        libName = *l;
+      } else
+      if (libName == "debug")
+      {
+        ++l;
+        libName = *l;
+      }
+    if (mightExpandVariablesCMP0019(libName.c_str())) {
+      std::string orig = libName;
+      this->ExpandVariablesInString(libName, true, true);
+      if (pol == cmPolicies::WARN && libName != orig) {
         /* clang-format off */
         w << "Evaluated link library\n"
           << "  " << orig << "\n"
           << "as\n"
-          << "  " << l->first << "\n";
+          << "  " << libName << "\n";
         /* clang-format on */
       }
+    }
     }
   }
 

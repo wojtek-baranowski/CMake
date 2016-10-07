@@ -197,15 +197,6 @@ public:
     const char* comment = CM_NULLPTR, bool uses_terminal = false);
 
   /**
-   * Add a link library to the build.
-   */
-  void AddLinkLibrary(const std::string&);
-  void AddLinkLibrary(const std::string&, cmTargetLinkLibraryType type);
-  void AddLinkLibraryForTarget(const std::string& tgt, const std::string&,
-                               cmTargetLinkLibraryType type);
-  void AddLinkDirectoryForTarget(const std::string& tgt, const std::string& d);
-
-  /**
    * Add a subdirectory to the build.
    */
   void AddSubDirectory(const std::string& fullSrcDir,
@@ -780,9 +771,6 @@ public:
   void AddExportBuildFileGenerator(cmExportBuildFileGenerator* gen);
 
 protected:
-  // add link libraries and directories to the target
-  void AddGlobalLinkInformation(const std::string& name, cmTarget& target);
-
   // Check for a an unused variable
   void LogUnused(const char* reason, const std::string& name) const;
 
@@ -805,17 +793,12 @@ protected:
   // Tests
   std::map<std::string, cmTest*> Tests;
 
-  // The link-library paths.  Order matters, use std::vector (not std::set).
-  std::vector<std::string> LinkDirectories;
-
   // The set of include directories that are marked as system include
   // directories.
   std::set<std::string> SystemIncludeDirectories;
 
   std::vector<std::string> ListFiles;
   std::vector<std::string> OutputFiles;
-
-  cmTarget::LinkLibraryVectorType LinkLibraries;
 
   std::vector<cmInstallGenerator*> InstallGenerators;
   std::vector<cmTestGenerator*> TestGenerators;

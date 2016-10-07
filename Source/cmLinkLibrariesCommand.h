@@ -27,6 +27,8 @@ public:
   bool InitialPass(std::vector<std::string> const& args,
                    cmExecutionStatus& status) CM_OVERRIDE;
 
+  static void PopulateTarget(cmTarget& target, cmMakefile* mf);
+
   /**
    * The name of the command as specified in CMakeList.txt.
    */

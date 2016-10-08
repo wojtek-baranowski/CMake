@@ -1405,7 +1405,6 @@ void cmLocalGenerator::OutputLinkLibraries(
   OutputFormat shellFormat =
     (forResponseFile) ? RESPONSE : ((useWatcomQuote) ? WATCOMQUOTE : SHELL);
   bool escapeAllowMakeVars = !forResponseFile;
-  std::ostringstream fout;
 
   cmComputeLinkInformation& cli = *pcli;
 
@@ -1497,6 +1496,7 @@ void cmLocalGenerator::OutputLinkLibraries(
     }
   }
 
+  std::ostringstream fout;
   fout << rpath;
 
   // Write the library flags to the build rule.

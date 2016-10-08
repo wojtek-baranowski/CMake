@@ -1403,8 +1403,6 @@ void cmLocalGenerator::OutputLinkLibraries(
 {
   OutputFormat shellFormat =
     (forResponseFile) ? RESPONSE : ((useWatcomQuote) ? WATCOMQUOTE : SHELL);
-  bool escapeAllowMakeVars = !forResponseFile;
-
   cmComputeLinkInformation& cli = *pcli;
 
   std::string linkLanguage = cli.GetLinkLanguage();
@@ -1456,7 +1454,7 @@ void cmLocalGenerator::OutputLinkLibraries(
   std::string rpath_link = cli.GetRPathLinkString();
   if (!cli.GetRPathLinkFlag().empty() && !rpath_link.empty()) {
     fout << cli.GetRPathLinkFlag();
-    fout << this->EscapeForShell(rpath_link, escapeAllowMakeVars);
+    fout << this->EscapeForShell(rpath_link, !forResponseFile);
     fout << " ";
   }
 

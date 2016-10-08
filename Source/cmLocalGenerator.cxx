@@ -1226,7 +1226,7 @@ void cmLocalGenerator::GetTargetFlags(
         return;
       }
       this->AddLanguageFlags(flags, linkLanguage, buildType);
-      if (!pcli) {
+      if (pcli) {
         this->OutputLinkLibraries(pcli, linkLineComputer, linkLibs,
                                   frameworkPath, linkPath);
       }

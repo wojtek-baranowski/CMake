@@ -1596,7 +1596,7 @@ cmLinkLineComputer* cmMakefileTargetGenerator::CreateLinkLineComputer(
 }
 
 void cmMakefileTargetGenerator::CreateLinkLibs(
-  cmLinkLineComputer* linkLineComputer, std::string& linkLibs, bool relink,
+  cmLinkLineComputer* linkLineComputer, std::string& linkLibs,
   bool useResponseFile, std::vector<std::string>& makefile_depends,
   bool useWatcomQuote)
 {
@@ -1606,7 +1606,7 @@ void cmMakefileTargetGenerator::CreateLinkLibs(
   cmComputeLinkInformation* pcli =
     this->GeneratorTarget->GetLinkInformation(config);
   this->LocalGenerator->OutputLinkLibraries(pcli, linkLineComputer, linkLibs,
-                                            frameworkPath, linkPath, relink,
+                                            frameworkPath, linkPath,
                                             useResponseFile, useWatcomQuote);
   linkLibs = frameworkPath + linkPath + linkLibs;
 

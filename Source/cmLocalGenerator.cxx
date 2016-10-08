@@ -1206,7 +1206,7 @@ void cmLocalGenerator::GetTargetFlags(
       }
       if (pcli) {
         this->OutputLinkLibraries(pcli, linkLineComputer, linkLibs,
-                                  frameworkPath, linkPath, false);
+                                  frameworkPath, linkPath);
       }
     } break;
     case cmState::EXECUTABLE: {
@@ -1228,7 +1228,7 @@ void cmLocalGenerator::GetTargetFlags(
       this->AddLanguageFlags(flags, linkLanguage, buildType);
       if (!pcli) {
         this->OutputLinkLibraries(pcli, linkLineComputer, linkLibs,
-                                  frameworkPath, linkPath, false);
+                                  frameworkPath, linkPath);
       }
       if (cmSystemTools::IsOn(
             this->Makefile->GetDefinition("BUILD_SHARED_LIBS"))) {
@@ -1396,7 +1396,7 @@ std::string cmLocalGenerator::GetTargetFortranFlags(
 void cmLocalGenerator::OutputLinkLibraries(
   cmComputeLinkInformation* pcli, cmLinkLineComputer* linkLineComputer,
   std::string& linkLibraries, std::string& frameworkPath,
-  std::string& linkPath, bool forResponseFile)
+  std::string& linkPath)
 {
   cmComputeLinkInformation& cli = *pcli;
 
@@ -1427,29 +1427,7 @@ void cmLocalGenerator::OutputLinkLibraries(
   linkPath =
     linkLineComputer->ComputeLinkPath(cli, libPathFlag, libPathTerminator);
 
-  std::string linkLibs = linkLineComputer->ComputeLinkLibs(cli);
-
-  std::string rpath = linkLineComputer->ComputeRPath(cli);
-
-  std::ostringstream fout;
-  fout << rpath;
-
-  // Write the library flags to the build rule.
-  fout << linkLibs;
-
-  // Add the linker runtime search path if any.
-  std::string rpath_link = cli.GetRPathLinkString();
-  if (!cli.GetRPathLinkFlag().empty() && !rpath_link.empty()) {
-    fout << cli.GetRPathLinkFlag();
-    fout << this->EscapeForShell(rpath_link, !forResponseFile);
-    fout << " ";
-  }
-
-  if (!stdLibString.empty()) {
-    fout << stdLibString << " ";
-  }
-
-  linkLibraries = fout.str();
+  linkLibraries = linkLineComputer->ComputeLinkLibraries(cli, stdLibString);
 }
 
 std::string cmLocalGenerator::GetLinkLibsCMP0065(

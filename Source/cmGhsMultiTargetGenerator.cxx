@@ -366,10 +366,11 @@ void cmGhsMultiTargetGenerator::WriteTargetLinkLibraries(
       this->LocalGenerator,
       this->GetGlobalGenerator()->CreateLinkLineComputer(
         this->LocalGenerator->GetStateSnapshot().GetDirectory()));
+    linkLineComputer->SetUseWatcomQuote(useWatcomQuote);
 
     this->LocalGenerator->GetTargetFlags(
       linkLineComputer.get(), config, linkLibraries, flags, linkFlags,
-      frameworkPath, linkPath, this->GeneratorTarget, useWatcomQuote);
+      frameworkPath, linkPath, this->GeneratorTarget);
     linkFlags = cmSystemTools::TrimWhitespace(linkFlags);
 
     if (!linkPath.empty()) {

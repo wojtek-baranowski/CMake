@@ -362,9 +362,15 @@ void cmGhsMultiTargetGenerator::WriteTargetLinkLibraries(
       this->GeneratorTarget->GetCreateRuleVariable(language, config);
     bool useWatcomQuote =
       this->Makefile->IsOn(createRule + "_USE_WATCOM_QUOTE");
+    CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
+      this->LocalGenerator,
+      this->GetGlobalGenerator()->CreateLinkLineComputer(
+        this->LocalGenerator->GetStateSnapshot().GetDirectory()));
+    linkLineComputer->SetUseWatcomQuote(useWatcomQuote);
+
     this->LocalGenerator->GetTargetFlags(
-      config, linkLibraries, flags, linkFlags, frameworkPath, linkPath,
-      this->GeneratorTarget, useWatcomQuote);
+      linkLineComputer.get(), config, linkLibraries, flags, linkFlags,
+      frameworkPath, linkPath, this->GeneratorTarget);
     linkFlags = cmSystemTools::TrimWhitespace(linkFlags);
 
     if (!linkPath.empty()) {

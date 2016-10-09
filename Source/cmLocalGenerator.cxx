@@ -1176,7 +1176,8 @@ void cmLocalGenerator::GetTargetFlags(
           !(this->Makefile->IsOn("CYGWIN") || this->Makefile->IsOn("MINGW"))) {
         std::vector<cmSourceFile*> sources;
         target->GetSourceFiles(sources, buildType);
-        std::string defFlag = this->Makefile->GetSafeDefinition("CMAKE_LINK_DEF_FILE_FLAG");
+        std::string defFlag =
+          this->Makefile->GetSafeDefinition("CMAKE_LINK_DEF_FILE_FLAG");
         for (std::vector<cmSourceFile*>::const_iterator i = sources.begin();
              i != sources.end(); ++i) {
           cmSourceFile* sf = *i;

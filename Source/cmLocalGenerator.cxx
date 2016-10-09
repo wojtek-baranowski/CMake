@@ -724,12 +724,14 @@ std::string cmLocalGenerator::ExpandRuleVariable(
       return replaceValues.Language;
     }
   }
-  if (replaceValues.CMTarget) {
+  if (replaceValues.CMTargetName) {
     if (variable == "TARGET_NAME") {
-      return replaceValues.CMTarget->GetName();
+      return replaceValues.CMTargetName;
     }
+  }
+  if (replaceValues.CMTargetType) {
     if (variable == "TARGET_TYPE") {
-      return cmState::GetTargetTypeName(replaceValues.CMTarget->GetType());
+      return replaceValues.CMTargetType;
     }
   }
   if (replaceValues.Output) {

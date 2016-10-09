@@ -552,7 +552,6 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
     vars.TargetVersionMajor = targetVersionMajor.c_str();
     vars.TargetVersionMinor = targetVersionMinor.c_str();
 
-    vars.RuleLauncher = "RULE_LAUNCH_LINK";
     vars.CMTarget = this->GeneratorTarget;
     vars.Language = linkLanguage.c_str();
     vars.Objects = buildObjs.c_str();
@@ -614,6 +613,14 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
     }
     vars.LanguageCompileFlags = langFlags.c_str();
 
+    std::string launcher;
+    const char* val = this->LocalGenerator->GetRuleLauncher(
+      this->GeneratorTarget, "RULE_LAUNCH_LINK");
+    if (val && *val) {
+      launcher = val;
+      launcher += " ";
+    }
+
     // Construct the main link rule and expand placeholders.
     this->LocalGenerator->TargetImplib = targetOutPathImport;
     if (useArchiveRules) {
@@ -628,7 +635,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
         for (std::vector<std::string>::const_iterator i =
                archiveCreateCommands.begin();
              i != archiveCreateCommands.end(); ++i) {
-          std::string cmd = *i;
+          std::string cmd = launcher + *i;
           this->LocalGenerator->ExpandRuleVariables(cmd, vars);
           real_link_commands.push_back(cmd);
         }
@@ -639,7 +646,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
         for (std::vector<std::string>::const_iterator i =
                archiveAppendCommands.begin();
              i != archiveAppendCommands.end(); ++i) {
-          std::string cmd = *i;
+          std::string cmd = launcher + *i;
           this->LocalGenerator->ExpandRuleVariables(cmd, vars);
           real_link_commands.push_back(cmd);
         }
@@ -649,7 +656,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
       for (std::vector<std::string>::const_iterator i =
              archiveFinishCommands.begin();
            i != archiveFinishCommands.end(); ++i) {
-        std::string cmd = *i;
+        std::string cmd = launcher + *i;
         this->LocalGenerator->ExpandRuleVariables(cmd, vars);
         // If there is no ranlib the command will be ":".  Skip it.
         if (!cmd.empty() && cmd[0] != ':') {
@@ -672,6 +679,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
       // Expand placeholders.
       for (std::vector<std::string>::iterator i = real_link_commands.begin();
            i != real_link_commands.end(); ++i) {
+        *i = launcher + *i;
         this->LocalGenerator->ExpandRuleVariables(*i, vars);
       }
     }

@@ -204,8 +204,8 @@ std::string cmRulePlaceholderExpander::ExpandRuleVariable(
     this->Compilers.find(variable);
 
   if (compIt != this->Compilers.end()) {
-    std::string ret =
-      this->VariableMappings["CMAKE_" + compIt->second + "_COMPILER"];
+    std::string ret = outputConverter->ConvertToOutputForExisting(
+      this->VariableMappings["CMAKE_" + compIt->second + "_COMPILER"]);
     std::string const& compilerArg1 =
       this->VariableMappings[compIt->first + "_COMPILER_ARG1"];
     std::string const& compilerTarget =

@@ -5,7 +5,6 @@
 #include "cmGeneratedFileStream.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalGhsMultiGenerator.h"
-#include "cmLinkLineComputer.h"
 #include "cmLocalGhsMultiGenerator.h"
 #include "cmMakefile.h"
 #include "cmSourceFile.h"
@@ -363,15 +362,9 @@ void cmGhsMultiTargetGenerator::WriteTargetLinkLibraries(
       this->GeneratorTarget->GetCreateRuleVariable(language, config);
     bool useWatcomQuote =
       this->Makefile->IsOn(createRule + "_USE_WATCOM_QUOTE");
-    CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
-      this->GetGlobalGenerator()->CreateLinkLineComputer(
-        this->LocalGenerator,
-        this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-    linkLineComputer->SetUseWatcomQuote(useWatcomQuote);
-
     this->LocalGenerator->GetTargetFlags(
-      linkLineComputer.get(), config, linkLibraries, flags, linkFlags,
-      frameworkPath, linkPath, this->GeneratorTarget);
+      config, linkLibraries, flags, linkFlags, frameworkPath, linkPath,
+      this->GeneratorTarget, useWatcomQuote);
     linkFlags = cmSystemTools::TrimWhitespace(linkFlags);
 
     if (!linkPath.empty()) {

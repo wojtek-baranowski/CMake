@@ -16,7 +16,6 @@ class cmGlobalCommonGenerator;
 class cmLocalCommonGenerator;
 class cmMakefile;
 class cmSourceFile;
-class cmLinkLineComputer;
 
 /** \class cmCommonTargetGenerator
  * \brief Common infrastructure for Makefile and Ninja per-target generators
@@ -38,8 +37,7 @@ protected:
   bool GetFeatureAsBool(const std::string& feature);
 
   // Helper to add flag for windows .def file.
-  void AddModuleDefinitionFlag(cmLinkLineComputer* linkLineComputer,
-                               std::string& flags);
+  void AddModuleDefinitionFlag(std::string& flags);
 
   cmGeneratorTarget* GeneratorTarget;
   cmMakefile* Makefile;

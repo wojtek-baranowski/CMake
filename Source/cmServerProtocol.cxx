@@ -7,7 +7,6 @@
 #include "cmFileMonitor.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalGenerator.h"
-#include "cmLinkLineComputer.h"
 #include "cmListFileCache.h"
 #include "cmLocalGenerator.h"
 #include "cmMakefile.h"
@@ -729,10 +728,8 @@ static Json::Value DumpTarget(cmGeneratorTarget* target,
     std::string linkLanguageFlags;
     std::string frameworkPath;
     std::string linkPath;
-    cmLinkLineComputer linkLineComputer(lg,
-                                        lg->GetStateSnapshot().GetDirectory());
-    lg->GetTargetFlags(&linkLineComputer, config, linkLibs, linkLanguageFlags,
-                       linkFlags, frameworkPath, linkPath, target);
+    lg->GetTargetFlags(config, linkLibs, linkLanguageFlags, linkFlags,
+                       frameworkPath, linkPath, target, false);
 
     linkLibs = cmSystemTools::TrimWhitespace(linkLibs);
     linkFlags = cmSystemTools::TrimWhitespace(linkFlags);

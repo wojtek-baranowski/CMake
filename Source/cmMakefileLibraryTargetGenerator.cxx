@@ -5,7 +5,6 @@
 #include "cmGeneratedFileStream.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalUnixMakefileGenerator3.h"
-#include "cmLinkLineComputer.h"
 #include "cmLocalGenerator.h"
 #include "cmLocalUnixMakefileGenerator3.h"
 #include "cmMakefile.h"
@@ -160,13 +159,7 @@ void cmMakefileLibraryTargetGenerator::WriteSharedLibraryRules(bool relink)
 
   this->LocalGenerator->AddConfigVariableFlags(
     extraFlags, "CMAKE_SHARED_LINKER_FLAGS", this->ConfigName);
-
-  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
-    this->CreateLinkLineComputer(
-      this->LocalGenerator,
-      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-
-  this->AddModuleDefinitionFlag(linkLineComputer.get(), extraFlags);
+  this->AddModuleDefinitionFlag(extraFlags);
 
   if (this->GeneratorTarget->GetProperty("LINK_WHAT_YOU_USE")) {
     this->LocalGenerator->AppendFlags(extraFlags, " -Wl,--no-as-needed");
@@ -191,13 +184,7 @@ void cmMakefileLibraryTargetGenerator::WriteModuleLibraryRules(bool relink)
     extraFlags, this->GeneratorTarget->GetProperty(linkFlagsConfig));
   this->LocalGenerator->AddConfigVariableFlags(
     extraFlags, "CMAKE_MODULE_LINKER_FLAGS", this->ConfigName);
-
-  CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
-    this->CreateLinkLineComputer(
-      this->LocalGenerator,
-      this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-
-  this->AddModuleDefinitionFlag(linkLineComputer.get(), extraFlags);
+  this->AddModuleDefinitionFlag(extraFlags);
 
   this->WriteLibraryRules(linkRuleVar, extraFlags, relink);
 }
@@ -504,17 +491,8 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules(
     // Collect up flags to link in needed libraries.
     std::string linkLibs;
     if (this->GeneratorTarget->GetType() != cmState::STATIC_LIBRARY) {
-
-      CM_AUTO_PTR<cmLinkLineComputer> linkLineComputer(
-        this->CreateLinkLineComputer(
-          this->LocalGenerator,
-          this->LocalGenerator->GetStateSnapshot().GetDirectory()));
-      linkLineComputer->SetForResponse(useResponseFileForLibs);
-      linkLineComputer->SetUseWatcomQuote(useWatcomQuote);
-      linkLineComputer->SetRelink(relink);
-
-      this->CreateLinkLibs(linkLineComputer.get(), linkLibs,
-                           useResponseFileForLibs, depends);
+      this->CreateLinkLibs(linkLibs, relink, useResponseFileForLibs, depends,
+                           useWatcomQuote);
     }
 
     // Construct object file lists that may be needed to expand the

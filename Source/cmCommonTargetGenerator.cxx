@@ -12,7 +12,6 @@
 #include "cmComputeLinkInformation.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalCommonGenerator.h"
-#include "cmLinkLineComputer.h"
 #include "cmLocalCommonGenerator.h"
 #include "cmLocalGenerator.h"
 #include "cmMakefile.h"
@@ -60,8 +59,7 @@ void cmCommonTargetGenerator::AddFeatureFlags(std::string& flags,
   }
 }
 
-void cmCommonTargetGenerator::AddModuleDefinitionFlag(
-  cmLinkLineComputer* linkLineComputer, std::string& flags)
+void cmCommonTargetGenerator::AddModuleDefinitionFlag(std::string& flags)
 {
   if (!this->ModuleDefinitionFile) {
     return;
@@ -78,7 +76,7 @@ void cmCommonTargetGenerator::AddModuleDefinitionFlag(
   // vs6's "cl -link" pass it to the linker.
   std::string flag = defFileFlag;
   flag += this->LocalGenerator->ConvertToOutputFormat(
-    linkLineComputer->ConvertToLinkReference(
+    this->LocalGenerator->ConvertToLinkReference(
       this->ModuleDefinitionFile->GetFullPath()),
     cmOutputConverter::SHELL);
   this->LocalGenerator->AppendFlags(flags, flag);

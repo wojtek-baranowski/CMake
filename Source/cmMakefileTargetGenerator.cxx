@@ -18,7 +18,6 @@
 #include "cmMakefileLibraryTargetGenerator.h"
 #include "cmMakefileUtilityTargetGenerator.h"
 #include "cmOutputConverter.h"
-#include "cmRulePlaceholderExpander.h"
 #include "cmSourceFile.h"
 #include "cmState.h"
 #include "cmSystemTools.h"
@@ -544,11 +543,9 @@ void cmMakefileTargetGenerator::WriteObjectBuildFile(
       targetOutPathCompilePDB[targetOutPathCompilePDB.size() - 1] = '/';
     }
   }
-  cmRulePlaceholderExpander::RuleVariables vars;
+  cmLocalGenerator::RuleVariables vars;
   vars.RuleLauncher = "RULE_LAUNCH_COMPILE";
-  vars.CMTargetName = this->GeneratorTarget->GetName().c_str();
-  vars.CMTargetType =
-    cmState::GetTargetTypeName(this->GeneratorTarget->GetType());
+  vars.CMTarget = this->GeneratorTarget;
   vars.Language = lang.c_str();
   vars.Target = targetOutPathReal.c_str();
   vars.TargetPDB = targetOutPathPDB.c_str();
@@ -590,9 +587,6 @@ void cmMakefileTargetGenerator::WriteObjectBuildFile(
   bool const lang_has_assembly = lang_has_preprocessor;
   bool const lang_can_export_cmds = lang_has_preprocessor;
 
-  CM_AUTO_PTR<cmRulePlaceholderExpander> rulePlaceholderExpander(
-    this->LocalGenerator->CreateRulePlaceholderExpander());
-
   // Construct the compile rules.
   {
     std::string compileRuleVar = "CMAKE_";
@@ -606,9 +600,7 @@ void cmMakefileTargetGenerator::WriteObjectBuildFile(
     if (this->Makefile->IsOn("CMAKE_EXPORT_COMPILE_COMMANDS") &&
         lang_can_export_cmds && compileCommands.size() == 1) {
       std::string compileCommand = compileCommands[0];
-
-      rulePlaceholderExpander->ExpandRuleVariables(this->LocalGenerator,
-                                                   compileCommand, vars);
+      this->LocalGenerator->ExpandRuleVariables(compileCommand, vars);
       std::string workingDirectory = cmSystemTools::CollapseFullPath(
         this->LocalGenerator->GetCurrentBinaryDirectory());
       compileCommand.replace(compileCommand.find(langFlags), langFlags.size(),
@@ -667,8 +659,7 @@ void cmMakefileTargetGenerator::WriteObjectBuildFile(
     // Expand placeholders in the commands.
     for (std::vector<std::string>::iterator i = compileCommands.begin();
          i != compileCommands.end(); ++i) {
-      rulePlaceholderExpander->ExpandRuleVariables(this->LocalGenerator, *i,
-                                                   vars);
+      this->LocalGenerator->ExpandRuleVariables(*i, vars);
     }
 
     // Change the command working directory to the local build tree.
@@ -731,8 +722,7 @@ void cmMakefileTargetGenerator::WriteObjectBuildFile(
         // Expand placeholders in the commands.
         for (std::vector<std::string>::iterator i = preprocessCommands.begin();
              i != preprocessCommands.end(); ++i) {
-          rulePlaceholderExpander->ExpandRuleVariables(this->LocalGenerator,
-                                                       *i, vars);
+          this->LocalGenerator->ExpandRuleVariables(*i, vars);
         }
 
         this->LocalGenerator->CreateCDCommand(
@@ -779,8 +769,7 @@ void cmMakefileTargetGenerator::WriteObjectBuildFile(
         // Expand placeholders in the commands.
         for (std::vector<std::string>::iterator i = assemblyCommands.begin();
              i != assemblyCommands.end(); ++i) {
-          rulePlaceholderExpander->ExpandRuleVariables(this->LocalGenerator,
-                                                       *i, vars);
+          this->LocalGenerator->ExpandRuleVariables(*i, vars);
         }
 
         this->LocalGenerator->CreateCDCommand(

@@ -42,8 +42,6 @@ public:
 
   void Generate() CM_OVERRIDE;
 
-  cmRulePlaceholderExpander* CreateRulePlaceholderExpander() const CM_OVERRIDE;
-
   std::string GetTargetDirectory(cmGeneratorTarget const* target) const
     CM_OVERRIDE;
 
@@ -58,6 +56,12 @@ public:
   std::string GetHomeRelativeOutputPath() const
   {
     return this->HomeRelativeOutputPath;
+  }
+
+  void ExpandRuleVariables(std::string& string,
+                           const RuleVariables& replaceValues)
+  {
+    cmLocalGenerator::ExpandRuleVariables(string, replaceValues);
   }
 
   std::string BuildCommandLine(const std::vector<std::string>& cmdLines);

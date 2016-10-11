@@ -309,8 +309,6 @@ set(SRCS
   cmLocalCommonGenerator.h
   cmLocalGenerator.cxx
   cmLocalGenerator.h
-  cmRulePlaceholderExpander.cxx
-  cmRulePlaceholderExpander.h
   cmLocalUnixMakefileGenerator3.cxx
   cmLocale.h
   ${MACH_SRCS}

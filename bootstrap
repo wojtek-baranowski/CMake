@@ -281,7 +281,6 @@ CMAKE_CXX_SOURCES="\
   cmInstallDirectoryGenerator \
   cmLocalCommonGenerator \
   cmLocalGenerator \
-  cmRulePlaceholderExpander \
   cmInstalledFile \
   cmInstallGenerator \
   cmInstallExportGenerator \

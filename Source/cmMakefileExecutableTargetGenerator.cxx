@@ -11,7 +11,6 @@
 #include "cmMakefile.h"
 #include "cmOSXBundleGenerator.h"
 #include "cmOutputConverter.h"
-#include "cmRulePlaceholderExpander.h"
 #include "cmSystemTools.h"
 #include "cmake.h"
 
@@ -332,10 +331,9 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
 
     std::string manifests = this->GetManifests();
 
-    cmRulePlaceholderExpander::RuleVariables vars;
-    vars.CMTargetName = this->GeneratorTarget->GetName().c_str();
-    vars.CMTargetType =
-      cmState::GetTargetTypeName(this->GeneratorTarget->GetType());
+    cmLocalGenerator::RuleVariables vars;
+    vars.RuleLauncher = "RULE_LAUNCH_LINK";
+    vars.CMTarget = this->GeneratorTarget;
     vars.Language = linkLanguage.c_str();
     vars.Objects = buildObjs.c_str();
     std::string objectDir = this->GeneratorTarget->GetSupportDirectory();
@@ -385,26 +383,13 @@ void cmMakefileExecutableTargetGenerator::WriteExecutableRule(bool relink)
       real_link_commands.push_back(cmakeCommand);
     }
 
-    std::string launcher;
-
-    const char* val = this->LocalGenerator->GetRuleLauncher(
-      this->GeneratorTarget, "RULE_LAUNCH_LINK");
-    if (val && *val) {
-      launcher = val;
-      launcher += " ";
-    }
-
-    CM_AUTO_PTR<cmRulePlaceholderExpander> rulePlaceholderExpander(
-      this->LocalGenerator->CreateRulePlaceholderExpander());
-
     // Expand placeholders in the commands.
-    rulePlaceholderExpander->SetTargetImpLib(targetOutPathImport);
+    this->LocalGenerator->TargetImplib = targetOutPathImport;
     for (std::vector<std::string>::iterator i = real_link_commands.begin();
          i != real_link_commands.end(); ++i) {
-      *i = launcher + *i;
-      rulePlaceholderExpander->ExpandRuleVariables(this->LocalGenerator, *i,
-                                                   vars);
+      this->LocalGenerator->ExpandRuleVariables(*i, vars);
     }
+    this->LocalGenerator->TargetImplib = "";
 
     // Restore path conversion to normal shells.
     this->LocalGenerator->SetLinkScriptShell(false);

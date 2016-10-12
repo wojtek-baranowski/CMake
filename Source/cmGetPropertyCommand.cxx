@@ -6,8 +6,19 @@
 #include "cmPropertyDefinition.h"
 #include "cmSourceFile.h"
 #include "cmState.h"
+#include "cmTargetPropertyComputer.h"
 #include "cmTest.h"
 #include "cmake.h"
+
+#ifdef __clang__
+extern template const char* cmTargetPropertyComputer::ComputeLocationForBuild(
+  cmTarget const* tgt);
+extern template const char* cmTargetPropertyComputer::ComputeLocation(
+  cmTarget const* tgt, std::string const& config);
+extern template const char* cmTargetPropertyComputer::GetSources(
+  cmTarget const* tgt, cmMessenger* messenger,
+  cmListFileBacktrace const& context);
+#endif
 
 cmGetPropertyCommand::cmGetPropertyCommand()
 {
@@ -246,8 +257,18 @@ bool cmGetPropertyCommand::HandleTargetMode()
       }
       return this->StoreResult(CM_NULLPTR);
     }
-    return this->StoreResult(
-      target->GetProperty(this->PropertyName, this->Makefile));
+    const char* prop_cstr = 0;
+    cmListFileBacktrace bt = this->Makefile->GetBacktrace();
+    cmMessenger* messenger = this->Makefile->GetMessenger();
+    if (cmTargetPropertyComputer::PassesWhitelist(
+          target->GetType(), this->PropertyName, messenger, bt)) {
+      prop_cstr = cmTargetPropertyComputer::GetProperty(
+        target, this->PropertyName, messenger, bt);
+      if (!prop_cstr) {
+        prop_cstr = target->GetProperty(this->PropertyName);
+      }
+    }
+    return this->StoreResult(prop_cstr);
   }
   std::ostringstream e;
   e << "could not find TARGET " << this->Name

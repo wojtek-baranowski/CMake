@@ -1131,26 +1131,6 @@ void cmTarget::CheckProperty(const std::string& prop,
 
 const char* cmTarget::GetProperty(const std::string& prop) const
 {
-  return this->GetProperty(prop, this->Makefile);
-}
-
-const char* cmTarget::GetProperty(const std::string& prop,
-                                  cmMakefile* context) const
-{
-  if (!cmTargetPropertyComputer::PassesWhitelist(this->GetType(), prop,
-                                                 context->GetMessenger(),
-                                                 context->GetBacktrace())) {
-    return CM_NULLPTR;
-  }
-
-  if (const char* result = cmTargetPropertyComputer::GetProperty(
-        this, prop, context->GetMessenger(), context->GetBacktrace())) {
-    return result;
-  }
-  if (cmSystemTools::GetFatalErrorOccured()) {
-    return CM_NULLPTR;
-  }
-
   static UNORDERED_SET<std::string> specialProps;
 #define MAKE_STATIC_PROP(PROP) static const std::string prop##PROP = #PROP
   MAKE_STATIC_PROP(LINK_LIBRARIES);

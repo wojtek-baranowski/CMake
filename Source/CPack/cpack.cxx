@@ -17,9 +17,6 @@
 
 #include <cmsys/CommandLineArguments.hxx>
 #include <cmsys/Encoding.hxx>
-#if defined(_WIN32) && defined(CMAKE_BUILD_WITH_CMAKE)
-#include <cmsys/ConsoleBuf.hxx>
-#endif
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -87,11 +84,6 @@ int cpackDefinitionArgument(const char* argument, const char* cValue,
 // this is CPack.
 int main(int argc, char const* const* argv)
 {
-#if defined(_WIN32) && defined(CMAKE_BUILD_WITH_CMAKE)
-  // Replace streambuf so we can output Unicode to console
-  cmsys::ConsoleBuf::Manager consoleOut(std::cout);
-  cmsys::ConsoleBuf::Manager consoleErr(std::cerr, true);
-#endif
   cmsys::Encoding::CommandLineArguments args =
     cmsys::Encoding::CommandLineArguments::Main(argc, argv);
   argc = args.argc();

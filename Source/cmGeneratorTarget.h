@@ -32,6 +32,8 @@ public:
 
   cmLocalGenerator* GetLocalGenerator() const;
 
+  cmGlobalGenerator* GetGlobalGenerator() const;
+
   bool IsImported() const;
   bool IsImportedGloballyVisible() const;
   const char* GetLocation(const std::string& config) const;
@@ -529,6 +531,8 @@ public:
                         int& patch) const;
 
   std::string GetFortranModuleDirectory(std::string const& working_dir) const;
+
+  const char* GetSourcesProperty() const;
 
 private:
   void AddSourceCommon(const std::string& src);

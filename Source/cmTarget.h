@@ -30,6 +30,7 @@
 
 class cmMakefile;
 class cmSourceFile;
+class cmGlobalGenerator;
 class cmTargetInternals;
 
 class cmTargetInternalPointer
@@ -75,6 +76,8 @@ public:
    * Return the type of target.
    */
   cmState::TargetType GetType() const { return this->TargetTypeValue; }
+
+  cmGlobalGenerator* GetGlobalGenerator() const;
 
   ///! Set/Get the name of the target
   const std::string& GetName() const { return this->Name; }
@@ -197,7 +200,6 @@ public:
   void AppendProperty(const std::string& prop, const char* value,
                       bool asString = false);
   const char* GetProperty(const std::string& prop) const;
-  const char* GetProperty(const std::string& prop, cmMakefile* context) const;
   bool GetPropertyAsBool(const std::string& prop) const;
   void CheckProperty(const std::string& prop, cmMakefile* context) const;
 
@@ -208,7 +210,7 @@ public:
   }
 
   // Get the properties
-  cmPropertyMap& GetProperties() const { return this->Properties; }
+  cmPropertyMap const& GetProperties() const { return this->Properties; }
 
   bool GetMappedConfig(std::string const& desired_config, const char** loc,
                        const char** imp, std::string& suffix) const;
@@ -267,9 +269,10 @@ public:
     bool operator()(cmTarget const* t1, cmTarget const* t2) const;
   };
 
-private:
-  bool HandleLocationPropertyPolicy(cmMakefile* context) const;
+  std::string ImportedGetFullPath(const std::string& config,
+                                  bool implib) const;
 
+private:
   const char* GetSuffixVariableInternal(bool implib) const;
   const char* GetPrefixVariableInternal(bool implib) const;
 
@@ -278,11 +281,8 @@ private:
   void SetPropertyDefault(const std::string& property,
                           const char* default_value);
 
-  std::string ImportedGetFullPath(const std::string& config,
-                                  bool implib) const;
-
 private:
-  mutable cmPropertyMap Properties;
+  cmPropertyMap Properties;
   std::set<std::string> SystemIncludeDirectories;
   std::set<std::string> LinkDirectoriesEmmitted;
   std::set<std::string> Utilities;

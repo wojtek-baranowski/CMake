@@ -10,16 +10,6 @@
 #include "cmTest.h"
 #include "cmake.h"
 
-#ifdef __clang__
-extern template const char* cmTargetPropertyComputer::ComputeLocationForBuild(
-  cmTarget const* tgt);
-extern template const char* cmTargetPropertyComputer::ComputeLocation(
-  cmTarget const* tgt, std::string const& config);
-extern template const char* cmTargetPropertyComputer::GetSources(
-  cmTarget const* tgt, cmMessenger* messenger,
-  cmListFileBacktrace const& context);
-#endif
-
 cmGetPropertyCommand::cmGetPropertyCommand()
 {
   this->InfoType = OutValue;
@@ -262,8 +252,8 @@ bool cmGetPropertyCommand::HandleTargetMode()
     cmMessenger* messenger = this->Makefile->GetMessenger();
     if (cmTargetPropertyComputer::PassesWhitelist(
           target->GetType(), this->PropertyName, messenger, bt)) {
-      prop_cstr = cmTargetPropertyComputer::GetProperty(
-        target, this->PropertyName, messenger, bt);
+      prop_cstr =
+        target->GetComputedProperty(this->PropertyName, messenger, bt);
       if (!prop_cstr) {
         prop_cstr = target->GetProperty(this->PropertyName);
       }

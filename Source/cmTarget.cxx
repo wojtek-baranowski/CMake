@@ -1129,6 +1129,13 @@ void cmTarget::CheckProperty(const std::string& prop,
   }
 }
 
+const char* cmTarget::GetComputedProperty(
+  const std::string& prop, cmMessenger* messenger,
+  cmListFileBacktrace const& context) const
+{
+  return cmTargetPropertyComputer::GetProperty(this, prop, messenger, context);
+}
+
 const char* cmTarget::GetProperty(const std::string& prop) const
 {
   static UNORDERED_SET<std::string> specialProps;

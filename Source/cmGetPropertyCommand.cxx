@@ -10,6 +10,16 @@
 #include "cmTest.h"
 #include "cmake.h"
 
+#ifdef __clang__
+extern template const char* cmTargetPropertyComputer::ComputeLocationForBuild(
+  cmTarget const* tgt);
+extern template const char* cmTargetPropertyComputer::ComputeLocation(
+  cmTarget const* tgt, std::string const& config);
+extern template const char* cmTargetPropertyComputer::GetSources(
+  cmTarget const* tgt, cmMessenger* messenger,
+  cmListFileBacktrace const& context);
+#endif
+
 cmGetPropertyCommand::cmGetPropertyCommand()
 {
   this->InfoType = OutValue;

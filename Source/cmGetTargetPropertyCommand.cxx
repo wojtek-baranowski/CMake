@@ -4,16 +4,6 @@
 
 #include "cmTargetPropertyComputer.h"
 
-#ifdef __clang__
-extern template const char* cmTargetPropertyComputer::ComputeLocationForBuild(
-  cmTarget const* tgt);
-extern template const char* cmTargetPropertyComputer::ComputeLocation(
-  cmTarget const* tgt, std::string const& config);
-extern template const char* cmTargetPropertyComputer::GetSources(
-  cmTarget const* tgt, cmMessenger* messenger,
-  cmListFileBacktrace const& context);
-#endif
-
 // cmSetTargetPropertyCommand
 bool cmGetTargetPropertyCommand::InitialPass(
   std::vector<std::string> const& args, cmExecutionStatus&)
@@ -39,8 +29,7 @@ bool cmGetTargetPropertyCommand::InitialPass(
       cmMessenger* messenger = this->Makefile->GetMessenger();
       if (cmTargetPropertyComputer::PassesWhitelist(tgt->GetType(), args[2],
                                                     messenger, bt)) {
-        prop_cstr =
-          cmTargetPropertyComputer::GetProperty(tgt, args[2], messenger, bt);
+        prop_cstr = tgt->GetComputedProperty(args[2], messenger, bt);
         if (!prop_cstr) {
           prop_cstr = tgt->GetProperty(args[2]);
         }

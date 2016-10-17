@@ -1824,18 +1824,18 @@ std::string cmGeneratorTarget::GetMacContentDirectory(
 
 std::string cmGeneratorTarget::GetEffectiveFolderName() const
 {
-    std::string effectiveFolder;
+  std::string effectiveFolder;
 
-    if (!this->GlobalGenerator->UseFolderProperty()) {
-        return effectiveFolder;
-    }
-
-    const char* targetFolder = this->GetProperty("FOLDER");
-    if (targetFolder) {
-        effectiveFolder += targetFolder;
-    }
-
+  if (!this->GlobalGenerator->UseFolderProperty()) {
     return effectiveFolder;
+  }
+
+  const char* targetFolder = this->GetProperty("FOLDER");
+  if (targetFolder) {
+    effectiveFolder += targetFolder;
+  }
+
+  return effectiveFolder;
 }
 
 cmGeneratorTarget::CompileInfo const* cmGeneratorTarget::GetCompileInfo(

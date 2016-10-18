@@ -7,6 +7,7 @@
 
 #include "cmListFileCache.h"
 #include "cmSystemTools.h"
+#include "cmAlgorithms.h"
 
 #include <map>
 #include <string>

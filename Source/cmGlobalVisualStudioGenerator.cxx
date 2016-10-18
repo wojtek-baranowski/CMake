@@ -9,6 +9,7 @@
 #include "cmGeneratorTarget.h"
 #include "cmLocalVisualStudioGenerator.h"
 #include "cmMakefile.h"
+#include "cmState.h"
 #include "cmSourceFile.h"
 #include "cmTarget.h"
 #include <cmsys/Encoding.hxx>

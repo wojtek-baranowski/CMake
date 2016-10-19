@@ -83,8 +83,8 @@ bool cmTargetPropertyComputer::WhiteListedInterfaceProperty(
 }
 
 bool cmTargetPropertyComputer::PassesWhitelist(
-  cmStateEnums::TargetType tgtType, std::string const& prop, cmMessenger* messenger,
-  cmListFileBacktrace const& context)
+  cmStateEnums::TargetType tgtType, std::string const& prop,
+  cmMessenger* messenger, cmListFileBacktrace const& context)
 {
   if (tgtType == cmStateEnums::INTERFACE_LIBRARY &&
       !WhiteListedInterfaceProperty(prop)) {

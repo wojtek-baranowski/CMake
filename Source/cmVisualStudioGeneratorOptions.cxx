@@ -137,11 +137,6 @@ bool cmVisualStudioGeneratorOptions::IsWinRt() const
   return this->FlagMap.find("CompileAsWinRT") != this->FlagMap.end();
 }
 
-bool cmVisualStudioGeneratorOptions::IsManaged() const
-{
-  return this->FlagMap.find("CompileAsManaged") != this->FlagMap.end();
-}
-
 bool cmVisualStudioGeneratorOptions::UsingUnicode() const
 {
   // Look for the a _UNICODE definition.

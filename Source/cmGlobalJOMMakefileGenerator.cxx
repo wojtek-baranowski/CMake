@@ -3,6 +3,7 @@
 #include "cmGlobalJOMMakefileGenerator.h"
 
 #include "cmLocalUnixMakefileGenerator3.h"
+#include "cmState.h"
 #include "cmMakefile.h"
 
 cmGlobalJOMMakefileGenerator::cmGlobalJOMMakefileGenerator(cmake* cm)

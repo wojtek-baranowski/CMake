@@ -3,6 +3,7 @@
 #include "cmGlobalMinGWMakefileGenerator.h"
 
 #include "cmLocalUnixMakefileGenerator3.h"
+#include "cmState.h"
 #include "cmMakefile.h"
 
 cmGlobalMinGWMakefileGenerator::cmGlobalMinGWMakefileGenerator(cmake* cm)

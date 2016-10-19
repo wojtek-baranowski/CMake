@@ -803,9 +803,13 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
       }
       std::cerr << std::endl;
       return 1;
-    } else if (args[1] == "vs_link_exe") {
+    }
+
+    if (args[1] == "vs_link_exe") {
       return cmcmd::VisualStudioLink(args, 1);
-    } else if (args[1] == "vs_link_dll") {
+    }
+
+    if (args[1] == "vs_link_dll") {
       return cmcmd::VisualStudioLink(args, 2);
     }
 
@@ -928,7 +932,9 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
 #endif
       }
       return 0;
-    } else if (args[1] == "server") {
+    }
+
+    if (args[1] == "server") {
       const std::string pipePrefix = "--pipe=";
       bool supportExperimental = false;
       bool isDebug = false;

@@ -3,6 +3,10 @@
 #include "cmFindLibraryCommand.h"
 
 #include "cmState.h"
+#include "cmGlobalGenerator.h"
+#include "cmSystemTools.h"
+#include "cmVersion.h"
+
 #include <cmsys/Directory.hxx>
 
 cmFindLibraryCommand::cmFindLibraryCommand()

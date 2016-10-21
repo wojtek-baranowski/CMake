@@ -6,6 +6,7 @@
 #include "cmGlobalGenerator.h"
 #include "cmStateTypes.h"
 #include "cmake.h"
+#include "cmState.h"
 
 // cmGetCMakePropertyCommand
 bool cmGetCMakePropertyCommand::InitialPass(

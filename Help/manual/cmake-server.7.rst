@@ -403,7 +403,7 @@ CMake will reply like this (after reporting progress for some time)::
 Type "compute"
 ^^^^^^^^^^^^^^
 
-This request will generate build system files in the build directory and
+This requist will generate build system files in the build directory and
 is only available after a project was successfully "configure"d.
 
 Example::
@@ -520,7 +520,7 @@ sourceDirectory of the target.
 Example::
 
   [== CMake Server ==[
-  {"type":"codemodel"}
+  {"type":"project"}
   ]== CMake Server ==]
 
 CMake will reply::
@@ -529,7 +529,7 @@ CMake will reply::
   {
     "cookie":"",
     "type":"reply",
-    "inReplyTo":"codemodel",
+    "inReplyTo":"project",
 
     "projects":
     [
@@ -584,9 +584,9 @@ CMake will reply::
   ]== CMake Server ==]
 
 The output can be tailored to the specific needs via parameter passed when
-requesting "codemodel" information.
+requesting "project" information.
 
-You can have a "depth" key, which accepts "codemodel", "configuration" and
+You can have a "depth" key, which accepts "project", "configuration" and
 "target" as string values. These cause the output to be trimmed at the
 appropriate depth of the output tree.
 

@@ -7,6 +7,7 @@
 
 #include "cmCPackArchiveGenerator.h"
 #include "cmCPackGenerator.h"
+#include "cmTypeMacro.h"
 
 /** \class cmCPackTarCompressGenerator
  * \brief A generator for TarCompress files

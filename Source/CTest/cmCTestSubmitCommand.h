@@ -7,6 +7,7 @@
 
 #include "cmCTest.h"
 #include "cmCTestHandlerCommand.h"
+#include "cmTypeMacro.h"
 
 #include <set>
 #include <string>

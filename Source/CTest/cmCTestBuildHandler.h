@@ -6,6 +6,7 @@
 #include <cmConfigure.h>
 
 #include "cmCTestGenericHandler.h"
+#include "cmTypeMacro.h"
 
 #include <cmsys/RegularExpression.hxx>
 #include <deque>

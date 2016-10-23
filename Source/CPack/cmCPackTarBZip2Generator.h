@@ -7,6 +7,7 @@
 
 #include "cmCPackArchiveGenerator.h"
 #include "cmCPackGenerator.h"
+#include "cmTypeMacro.h"
 
 /** \class cmCPackTarBZip2Generator
  * \brief A generator for TarBZip2 files

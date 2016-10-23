@@ -6,6 +6,7 @@
 #include <cmConfigure.h>
 
 #include "cmCTestHandlerCommand.h"
+#include "cmTypeMacro.h"
 
 #include <string>
 

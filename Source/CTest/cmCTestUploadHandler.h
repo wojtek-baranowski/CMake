@@ -7,6 +7,7 @@
 
 #include "cmCTest.h"
 #include "cmCTestGenericHandler.h"
+#include "cmTypeMacro.h"
 
 /** \class cmCTestUploadHandler
  * \brief Helper class for CTest

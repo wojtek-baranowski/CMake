@@ -10,6 +10,7 @@
 #include "cmDefinitions.h"
 #include "cmListFileCache.h"
 #include "cmSystemTools.h"
+#include "cmTypeMacro.h"
 #include "cmake.h"
 
 #include <algorithm>

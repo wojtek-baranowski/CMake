@@ -6,7 +6,9 @@
 #include <cmConfigure.h>
 
 #include "cmCPackComponentGroup.h"
+#include "cmObject.h"
 #include "cmSystemTools.h"
+#include "cmTypeMacro.h"
 
 #include <map>
 #include <sstream>

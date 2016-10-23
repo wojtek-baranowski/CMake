@@ -10,6 +10,7 @@
 #include "cmCPackIFWInstaller.h"
 #include "cmCPackIFWPackage.h"
 #include "cmCPackIFWRepository.h"
+#include "cmTypeMacro.h"
 
 #include <map>
 #include <set>

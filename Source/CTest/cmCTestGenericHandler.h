@@ -6,6 +6,7 @@
 #include <cmConfigure.h>
 
 #include "cmCTest.h"
+#include "cmObject.h"
 #include "cmSystemTools.h"
 
 #include <map>

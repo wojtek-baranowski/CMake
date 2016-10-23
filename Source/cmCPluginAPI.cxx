@@ -7,10 +7,12 @@
 
 #include "cmCPluginAPI.h"
 
+#include "cmExecutionStatus.h"
+#include "cmGlobalGenerator.h"
 #include "cmMakefile.h"
-#include "cmVersion.h"
-
 #include "cmSourceFile.h"
+#include "cmVersion.h"
+#include "cmState.h"
 
 #include <stdlib.h>
 

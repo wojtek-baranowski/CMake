@@ -3,8 +3,6 @@
 #ifndef cmCommand_h
 #define cmCommand_h
 
-#include "cmObject.h"
-
 #include "cmCommandArgumentsHelper.h"
 #include "cmListFileCache.h"
 #include "cmMakefile.h"
@@ -19,11 +17,9 @@
  * to support such features as enable/disable, inheritance,
  * documentation, and construction.
  */
-class cmCommand : public cmObject
+class cmCommand
 {
 public:
-  cmTypeMacro(cmCommand, cmObject);
-
   /**
    * Construct the command. By default it is enabled with no makefile.
    */
@@ -36,7 +32,7 @@ public:
   /**
    * Need virtual destructor to destroy real command type.
    */
-  ~cmCommand() CM_OVERRIDE {}
+  virtual ~cmCommand() {}
 
   /**
    * Specify the makefile.
@@ -83,12 +79,10 @@ public:
   virtual bool IsScriptable() const { return false; }
 
   /**
-   * This is used to avoid including this command
-   * in documentation. This is mainly used by
-   * cmMacroHelperCommand and cmFunctionHelperCommand
-   * which cannot provide appropriate documentation.
+   * This determines if the command is defined in a cmake script.
+   * It is the case for cmMacroHelperCommand and cmFunctionHelperCommand.
    */
-  virtual bool ShouldAppearInDocumentation() const { return true; }
+  virtual bool IsUserDefined() const { return false; }
 
   /**
    * The name of the command as specified in CMakeList.txt.

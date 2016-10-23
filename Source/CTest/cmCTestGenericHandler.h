@@ -6,7 +6,6 @@
 #include <cmConfigure.h>
 
 #include "cmCTest.h"
-#include "cmObject.h"
 #include "cmSystemTools.h"
 
 #include <map>
@@ -22,7 +21,7 @@ class cmMakefile;
  * \brief A superclass of all CTest Handlers
  *
  */
-class cmCTestGenericHandler : public cmObject
+class cmCTestGenericHandler
 {
 public:
   /**
@@ -70,7 +69,7 @@ public:
    * Construct handler
    */
   cmCTestGenericHandler();
-  ~cmCTestGenericHandler() CM_OVERRIDE;
+  virtual ~cmCTestGenericHandler();
 
   typedef std::map<std::string, std::string> t_StringToString;
 

@@ -5,9 +5,6 @@
 
 #include <cmConfigure.h>
 
-#include "cmObject.h"
-#include "cmTypeMacro.h"
-
 #include <map>
 #include <string>
 #include <vector>
@@ -19,13 +16,11 @@ class cmCPackLog;
  * \brief A container for CPack generators
  *
  */
-class cmCPackGeneratorFactory : public cmObject
+class cmCPackGeneratorFactory
 {
 public:
-  cmTypeMacro(cmCPackGeneratorFactory, cmObject);
-
   cmCPackGeneratorFactory();
-  ~cmCPackGeneratorFactory() CM_OVERRIDE;
+  ~cmCPackGeneratorFactory();
 
   //! Get the generator
   cmCPackGenerator* NewGenerator(const std::string& name);

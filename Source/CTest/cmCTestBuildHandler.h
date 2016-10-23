@@ -6,7 +6,6 @@
 #include <cmConfigure.h>
 
 #include "cmCTestGenericHandler.h"
-#include "cmTypeMacro.h"
 
 #include <cmsys/RegularExpression.hxx>
 #include <deque>
@@ -25,7 +24,7 @@ class cmXMLWriter;
 class cmCTestBuildHandler : public cmCTestGenericHandler
 {
 public:
-  cmTypeMacro(cmCTestBuildHandler, cmCTestGenericHandler);
+  typedef cmCTestGenericHandler Superclass;
 
   /*
    * The main entry point for this class

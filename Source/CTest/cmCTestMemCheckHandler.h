@@ -6,7 +6,6 @@
 #include <cmConfigure.h>
 
 #include "cmCTestTestHandler.h"
-#include "cmTypeMacro.h"
 
 #include <string>
 #include <vector>
@@ -23,7 +22,7 @@ class cmCTestMemCheckHandler : public cmCTestTestHandler
   friend class cmCTestRunTest;
 
 public:
-  cmTypeMacro(cmCTestMemCheckHandler, cmCTestTestHandler);
+  typedef cmCTestTestHandler Superclass;
 
   void PopulateCustomVectors(cmMakefile* mf) CM_OVERRIDE;
 

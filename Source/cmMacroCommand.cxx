@@ -3,9 +3,9 @@
 #include "cmMacroCommand.h"
 
 #include "cmAlgorithms.h"
+#include "cmState.h"
 #include "cmSystemTools.h"
 #include "cmake.h"
-#include "cmState.h"
 
 // define the class for macro commands
 class cmMacroHelperCommand : public cmCommand

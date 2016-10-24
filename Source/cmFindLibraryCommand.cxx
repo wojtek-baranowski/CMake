@@ -2,8 +2,8 @@
    file Copyright.txt or https://cmake.org/licensing for details.  */
 #include "cmFindLibraryCommand.h"
 
-#include "cmState.h"
 #include "cmGlobalGenerator.h"
+#include "cmState.h"
 #include "cmSystemTools.h"
 #include "cmVersion.h"
 

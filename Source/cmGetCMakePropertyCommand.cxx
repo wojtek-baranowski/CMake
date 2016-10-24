@@ -4,9 +4,9 @@
 
 #include "cmAlgorithms.h"
 #include "cmGlobalGenerator.h"
+#include "cmState.h"
 #include "cmStateTypes.h"
 #include "cmake.h"
-#include "cmState.h"
 
 // cmGetCMakePropertyCommand
 bool cmGetCMakePropertyCommand::InitialPass(

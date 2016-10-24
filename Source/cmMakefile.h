@@ -884,7 +884,7 @@ private:
    */
   cmSourceFile* LinearGetSourceFileWithOutput(const std::string& cname) const;
 
-// A map for fast output to input look up.
+  // A map for fast output to input look up.
   typedef CM_UNORDERED_MAP<std::string, cmSourceFile*> OutputToSourceMap;
   OutputToSourceMap OutputToSource;
 

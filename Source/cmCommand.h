@@ -25,10 +25,11 @@ public:
   cmTypeMacro(cmCommand, cmObject);
 
   /**
-   * Construct the command. By default it has no makefile.
+   * Construct the command. By default it is enabled with no makefile.
    */
   cmCommand()
     : Makefile(CM_NULLPTR)
+    , Enabled(true)
   {
   }
 
@@ -95,6 +96,26 @@ public:
   virtual std::string GetName() const = 0;
 
   /**
+   * Enable the command.
+   */
+  void EnabledOn() { this->Enabled = true; }
+
+  /**
+   * Disable the command.
+   */
+  void EnabledOff() { this->Enabled = false; }
+
+  /**
+   * Query whether the command is enabled.
+   */
+  bool GetEnabled() const { return this->Enabled; }
+
+  /**
+   * Disable or enable the command.
+   */
+  void SetEnabled(bool enabled) { this->Enabled = enabled; }
+
+  /**
    * Return the last error string.
    */
   const char* GetError();
@@ -112,6 +133,7 @@ protected:
   cmCommandArgumentsHelper Helper;
 
 private:
+  bool Enabled;
   std::string Error;
 };
 

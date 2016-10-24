@@ -7,8 +7,8 @@
 #include "cmSetTargetPropertiesCommand.h"
 #include "cmSetTestsPropertiesCommand.h"
 #include "cmSourceFile.h"
-#include "cmTest.h"
 #include "cmState.h"
+#include "cmTest.h"
 
 cmSetPropertyCommand::cmSetPropertyCommand()
 {

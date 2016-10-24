@@ -11,8 +11,8 @@
 #include "cmGlobalGenerator.h"
 #include "cmMakefile.h"
 #include "cmSourceFile.h"
-#include "cmVersion.h"
 #include "cmState.h"
+#include "cmVersion.h"
 
 #include <stdlib.h>
 

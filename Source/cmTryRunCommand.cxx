@@ -2,9 +2,9 @@
    file Copyright.txt or https://cmake.org/licensing for details.  */
 #include "cmTryRunCommand.h"
 
+#include "cmState.h"
 #include "cmSystemTools.h"
 #include "cmTryCompileCommand.h"
-#include "cmState.h"
 
 #include <cmsys/FStream.hxx>
 

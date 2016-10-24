@@ -4,8 +4,8 @@
 
 #include "cmGeneratorExpression.h"
 #include "cmGlobalGenerator.h"
-#include "cmSystemTools.h"
 #include "cmState.h"
+#include "cmSystemTools.h"
 
 const char* cmTargetLinkLibrariesCommand::LinkLibraryTypeNames[3] = {
   "general", "debug", "optimized"

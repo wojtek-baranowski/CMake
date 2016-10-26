@@ -2,7 +2,7 @@
    file Copyright.txt or https://cmake.org/licensing for details.  */
 #include "cmEndWhileCommand.h"
 
-#include "cmListFileArgument.h"
+#include "cmListFileCache.h"
 
 class cmExecutionStatus;
 

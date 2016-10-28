@@ -259,7 +259,7 @@ static bool testValue(cmState* state, const std::string& key,
   if (!cachedValue.empty() && !value.empty() && cachedValue != value) {
     setErrorMessage(errorMessage, std::string("\"") + key +
                       "\" is set but incompatible with configured " +
-                      keyDescription + "value.");
+                      keyDescription + " value.");
     return false;
   }
   if (value.empty()) {

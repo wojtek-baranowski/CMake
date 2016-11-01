@@ -7,9 +7,9 @@ function(cmake_determine_compile_features lang)
   if(lang STREQUAL C AND COMMAND cmake_record_c_compile_features)
     message(STATUS "Detecting ${lang} compile features")
 
-    set(CMAKE_C90_COMPILE_FEATURES)
-    set(CMAKE_C99_COMPILE_FEATURES)
-    set(CMAKE_C11_COMPILE_FEATURES)
+    set(CMAKE_C90_COMPILE_FEATURES c_std_90)
+    set(CMAKE_C99_COMPILE_FEATURES c_std_99)
+    set(CMAKE_C11_COMPILE_FEATURES c_std_11)
 
     include("${CMAKE_ROOT}/Modules/Internal/FeatureTesting.cmake")
 
@@ -27,7 +27,13 @@ function(cmake_determine_compile_features lang)
       list(REMOVE_ITEM CMAKE_C99_COMPILE_FEATURES ${CMAKE_C90_COMPILE_FEATURES})
     endif()
 
-    if(NOT CMAKE_C_COMPILE_FEATURES)
+    if(CMAKE_C_COMPILE_FEATURES)
+      list(INSERT CMAKE_C_COMPILE_FEATURES 0
+        c_std_90
+        c_std_99
+        c_std_11
+        )
+    else()
       set(CMAKE_C_COMPILE_FEATURES
         ${CMAKE_C90_COMPILE_FEATURES}
         ${CMAKE_C99_COMPILE_FEATURES}
@@ -45,9 +51,9 @@ function(cmake_determine_compile_features lang)
   elseif(lang STREQUAL CXX AND COMMAND cmake_record_cxx_compile_features)
     message(STATUS "Detecting ${lang} compile features")
 
-    set(CMAKE_CXX98_COMPILE_FEATURES)
-    set(CMAKE_CXX11_COMPILE_FEATURES)
-    set(CMAKE_CXX14_COMPILE_FEATURES)
+    set(CMAKE_CXX98_COMPILE_FEATURES cxx_std_98)
+    set(CMAKE_CXX11_COMPILE_FEATURES cxx_std_11)
+    set(CMAKE_CXX14_COMPILE_FEATURES cxx_std_14)
 
     include("${CMAKE_ROOT}/Modules/Internal/FeatureTesting.cmake")
 
@@ -65,7 +71,13 @@ function(cmake_determine_compile_features lang)
       list(REMOVE_ITEM CMAKE_CXX11_COMPILE_FEATURES ${CMAKE_CXX98_COMPILE_FEATURES})
     endif()
 
-    if(NOT CMAKE_CXX_COMPILE_FEATURES)
+    if(CMAKE_CXX_COMPILE_FEATURES)
+      list(INSERT CMAKE_CXX_COMPILE_FEATURES 0
+        cxx_std_98
+        cxx_std_11
+        cxx_std_14
+        )
+    else()
       set(CMAKE_CXX_COMPILE_FEATURES
         ${CMAKE_CXX98_COMPILE_FEATURES}
         ${CMAKE_CXX11_COMPILE_FEATURES}
